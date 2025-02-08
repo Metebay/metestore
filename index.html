@@ -141,6 +141,36 @@
             color: #6c757d;
             border-top: 1px solid #eee;
         }
+                .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #fff;
+            color: #2c3e50;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
+            z-index: 1000;
+            animation: fadeInOut 7s ease forwards;
+            transform: translateX(120%);
+            max-width: 300px;
+        }
+
+        @keyframes fadeInOut {
+            0% { transform: translateX(120%); }
+            10% { transform: translateX(0); }
+            90% { transform: translateX(0); opacity: 1; }
+            100% { transform: translateX(120%); opacity: 0; }
+        }
+
+        .notification:hover {
+            background: #f8f9fa;
+        }
+
+        .notification::before {
+            content: "🔥 ";
+            font-size: 1.2em;
 
         /* Responsive Tasarım */
         @media (max-width: 768px) {
@@ -260,6 +290,41 @@
                 apkList.appendChild(apkItem);
             });
         }
+                const notifications = [
+            "Steve Jobs Fortnite indirdi!",
+            "Bill Gates TikTok'ta video çekiyor!",
+            "Mark Zuckerberg Minecraft oynuyor!",
+            "Elon Musk Instagram'dan hikaye paylaştı!",
+            "Jeff Bezos WhatsApp'ta çevrimiçi!",
+            "PewDiePie MeteStore'dan indirme yaptı!",
+            "Ninja Among Us oynamak için indirdi!",
+            "MrBeast 100.000$ dağıtmak için indirdi!",
+            "Dwayne Johnson fitness uygulaması indirdi!",
+            "Keanu Reeves bu uygulamayı 5 yıldız verdi!"
+        ];
+
+        function createNotification() {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = notifications[Math.floor(Math.random() * notifications.length)];
+            
+            notification.addEventListener('click', () => {
+                notification.remove();
+            });
+
+            document.body.appendChild(notification);
+            
+            // 7 saniye sonra kaldır
+            setTimeout(() => {
+                notification.remove();
+            }, 7000);
+        }
+
+        // Her 10 saniyede bir bildirim göster
+        setInterval(createNotification, 10000);
+
+        // İlk bildirimi hemen göster (isteğe bağlı)
+        setTimeout(createNotification, 2000);
 
         // Arama İşlevselliği
         searchInput.addEventListener('input', (e) => {
