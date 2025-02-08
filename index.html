@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MeteStore | Offline Uygulama Mağazası</title>
+    <title>MeteStore | Güvenli Uygulama Mağazası</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
             --primary: #6366f1;
@@ -35,44 +34,39 @@
             background: var(--background);
             color: var(--text);
             line-height: 1.6;
-            transition: background 0.3s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 2rem;
+            flex: 1;
         }
 
         .header {
             text-align: center;
             margin-bottom: 2rem;
-            padding: 2rem 0;
+            padding: 4rem 0;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
         .search-container {
-            position: relative;
             max-width: 600px;
-            margin: 1rem auto;
+            margin: 1rem auto 0;
         }
 
         .search-input {
             width: 100%;
-            padding: 12px 45px 12px 20px;
-            border: 2px solid var(--primary);
+            padding: 12px 20px;
+            border: none;
             border-radius: 30px;
             font-size: 1rem;
-            background: var(--background);
-            color: var(--text);
-            transition: all 0.3s ease;
-        }
-
-        .search-input:focus {
-            box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+            background: rgba(255,255,255,0.9);
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
         }
 
         .apk-list {
@@ -86,70 +80,76 @@
             border: 1px solid var(--border);
             padding: 1.5rem;
             border-radius: 15px;
-            transition: all 0.3s ease;
+            transition: transform 0.2s ease;
             position: relative;
         }
 
         .apk-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transform: translateY(-3px);
         }
 
-        .download-count {
-            position: absolute;
-            top: 10px;
-            right: 10px;
+        .footer {
             background: var(--primary);
             color: white;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 0.8rem;
+            padding: 3rem 0;
+            margin-top: auto;
         }
 
-        .favorite-btn {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--text);
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            padding: 0 2rem;
         }
 
-        .favorite-btn.active {
-            color: #ff4757;
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            padding-bottom: 0.5rem;
         }
 
-        .notification {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--background);
-            color: var(--text);
-            padding: 15px 25px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            cursor: pointer;
-            z-index: 1000;
-            animation: slideInOut 7s ease forwards;
-            max-width: 300px;
-            border: 1px solid var(--border);
+        .footer-links {
+            list-style: none;
         }
 
-        @keyframes slideInOut {
-            0%, 100% { transform: translateX(120%); opacity: 0; }
-            10%, 90% { transform: translateX(0); opacity: 1; }
+        .footer-links li {
+            margin-bottom: 0.5rem;
         }
 
-        .voice-search {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--primary);
+        .footer-links a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-icons a {
+            font-size: 1.5rem;
+            color: white;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            opacity: 1;
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
         }
     </style>
 </head>
@@ -157,12 +157,12 @@
     <div class="header">
         <div class="container">
             <h1><i class="fas fa-download"></i> MeteSTORE</h1>
-            <p>PLAY STORE BİLE BİZDEN İNDİRİYOR</p>
+            <p>Güvenli ve Hızlı Uygulama İndirme Platformu</p>
             <div class="search-container">
-                <input type="text" class="search-input" placeholder="Uygulama ara..." id="searchInput">
-                <button class="voice-search" aria-label="Sesli arama">
-                    <i class="fas fa-microphone"></i>
-                </button>
+                <input type="text" 
+                       class="search-input" 
+                       placeholder="Uygulama ara..."
+                       id="searchInput">
             </div>
         </div>
     </div>
@@ -170,35 +170,47 @@
     <div class="container">
         <div class="apk-list" id="apkList"></div>
         <div class="no-results hidden" id="noResults">
-            Aradığınız uygulama bulunamadı 😞
+            Aradığınız uygulama bulunamadı
         </div>
     </div>
 
-    <div class="footer">
-        <div class="container">
-            <p>© 2025 MeteSTORE - Tüm hakları saklıdır</p>
-            <p>Güvenli indirme garantisi</p>
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Hakkımızda</h3>
+                <p>MeteStore, kullanıcıların güvenli ve hızlı bir şekilde uygulama indirebileceği modern bir platformdur.</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Bağlantılar</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Gizlilik Politikası</a></li>
+                    <li><a href="#">Kullanım Şartları</a></li>
+                    <li><a href="#">SSS</a></li>
+                    <li><a href="#">İletişim</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Sosyal Medya</h3>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                </div>
+            </div>
         </div>
-    </div>
+        
+        <div class="copyright">
+            <p>© 2024 MeteStore - Tüm hakları saklıdır</p>
+        </div>
+    </footer>
 
     <script>
         class MeteStore {
             constructor() {
                 this.apkData = JSON.parse(localStorage.getItem('apkData')) || this.getDefaultData();
-                this.favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-                this.downloads = JSON.parse(localStorage.getItem('downloads')) || {};
-                this.notifications = [
-                    "Steve Jobs iOS 18'i buradan indirdi!",
-                    "Bill Gates Windows 12'yi MeteStore'dan yayınladı!",
-                    "Elon Mars'a giden roketin yazılımı burada!",
-                    "Jeff Bezos 1 milyonuncu indirmeye helikopter hediye!",
-                    "PewDiePie yeni videosunda bizi önerdi!",
-                    "MrBeast 100.000$ dağıtıyor!",
-                    "Ninja Valorant Mobile'ı indirdi!",
-                    "Cristiano Ronaldo fitness programını paylaştı!",
-                    "Tarkan şarkı sözleri uygulaması yayında!",
-                    "Selçuk Bayraktar drone yazılımını güncelledi!"
-                ];
                 this.init();
             }
 
@@ -207,7 +219,7 @@
                     {
                         name: "WhatsApp Messenger",
                         version: "2.23.15",
-                        size: 45000000,
+                        size: "45 MB",
                         url: "#",
                         description: "Güvenli mesajlaşma uygulaması",
                         rating: 4.2
@@ -215,7 +227,7 @@
                     {
                         name: "Instagram",
                         version: "289.0.0.20",
-                        size: 92000000,
+                        size: "92 MB",
                         url: "#",
                         description: "Sosyal medya platformu",
                         rating: 4.5
@@ -223,7 +235,7 @@
                     {
                         name: "TikTok",
                         version: "30.5.4",
-                        size: 128000000,
+                        size: "128 MB",
                         url: "#",
                         description: "Kısa video platformu",
                         rating: 4.0
@@ -234,118 +246,39 @@
             init() {
                 this.render();
                 this.setupEventListeners();
-                this.startNotifications();
-                this.setupServiceWorker();
-                this.setupVoiceSearch();
-                setInterval(() => this.saveToLocalStorage(), 5000);
             }
 
             render() {
                 const apkList = document.getElementById('apkList');
                 apkList.innerHTML = this.apkData.map(apk => `
                     <div class="apk-item">
-                        <div class="download-count">${this.formatSize(apk.size)}</div>
                         <i class="fas fa-mobile-alt" style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem;"></i>
                         <h2>${apk.name}</h2>
                         <p>${apk.description}</p>
-                        <div class="rating">${'★'.repeat(Math.round(apk.rating))}${'☆'.repeat(5 - Math.round(apk.rating))}</div>
-                        <button class="favorite-btn ${this.favorites.includes(apk.name) ? 'active' : ''}" 
-                                onclick="meteStore.toggleFavorite('${apk.name}')">
-                            <i class="${this.favorites.includes(apk.name) ? 'fas' : 'far'} fa-heart"></i>
-                        </button>
-                        <button class="download-btn" onclick="meteStore.handleDownload('${apk.name}')">
-                            <i class="fas fa-download"></i> İndir (${this.downloads[apk.name] || 0})
-                        </button>
+                        <div class="meta-info">
+                            <span>v${apk.version}</span>
+                            <span>${apk.size}</span>
+                        </div>
+                        <a href="${apk.url}" class="download-btn" download>
+                            <i class="fas fa-download"></i> İndir
+                        </a>
                     </div>
                 `).join('');
             }
 
-            toggleFavorite(name) {
-                this.favorites = this.favorites.includes(name) 
-                    ? this.favorites.filter(n => n !== name) 
-                    : [...this.favorites, name];
-                this.render();
-            }
-
-            handleDownload(name) {
-                this.downloads[name] = (this.downloads[name] || 0) + 1;
-                this.showNotification(`${name} indiriliyor...`);
-                this.render();
-            }
-
-            formatSize(bytes) {
-                const sizes = ['B', 'KB', 'MB', 'GB'];
-                if (bytes === 0) return '0 B';
-                const i = Math.floor(Math.log(bytes) / Math.log(1024));
-                return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + ' ' + sizes[i];
-            }
-
-            showNotification(text) {
-                const notification = document.createElement('div');
-                notification.className = 'notification';
-                notification.innerHTML = `🚀 ${text}`;
-                notification.onclick = () => notification.remove();
-                document.body.appendChild(notification);
-                setTimeout(() => notification.remove(), 7000);
-            }
-
-            startNotifications() {
-                setInterval(() => {
-                    this.showNotification(this.notifications[Math.floor(Math.random() * this.notifications.length)]);
-                }, 10000);
-            }
-
-            setupVoiceSearch() {
-                const voiceSearch = document.querySelector('.voice-search');
-                if ('webkitSpeechRecognition' in window) {
-                    const recognition = new webkitSpeechRecognition();
-                    recognition.lang = 'tr-TR';
-                    
-                    voiceSearch.addEventListener('click', () => {
-                        recognition.start();
-                        voiceSearch.innerHTML = '<i class="fas fa-microphone-slash"></i>';
-                    });
-
-                    recognition.onresult = (e) => {
-                        document.getElementById('searchInput').value = e.results[0][0].transcript;
-                        voiceSearch.innerHTML = '<i class="fas fa-microphone"></i>';
-                    };
-                } else {
-                    voiceSearch.style.display = 'none';
-                }
-            }
-
-            setupServiceWorker() {
-                if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.register('/sw.js')
-                        .then(() => console.log('Service Worker kaydedildi'))
-                        .catch(err => console.log('SW kaydı başarısız:', err));
-                }
-            }
-
-            saveToLocalStorage() {
-                localStorage.setItem('apkData', JSON.stringify(this.apkData));
-                localStorage.setItem('favorites', JSON.stringify(this.favorites));
-                localStorage.setItem('downloads', JSON.stringify(this.downloads));
+            setupEventListeners() {
+                document.getElementById('searchInput').addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.toLowerCase();
+                    this.apkData = this.getDefaultData().filter(apk => 
+                        apk.name.toLowerCase().includes(searchTerm) ||
+                        apk.description.toLowerCase().includes(searchTerm)
+                    );
+                    this.render();
+                });
             }
         }
 
         const meteStore = new MeteStore();
-
-        // Çevrimdışı bildirim
-        window.addEventListener('offline', () => {
-            meteStore.showNotification('İnternet bağlantısı yok. Çevrimdışı moda geçildi!');
-        });
-
-        // Arama fonksiyonu
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            meteStore.apkData = meteStore.getDefaultData().filter(apk => 
-                apk.name.toLowerCase().includes(searchTerm) ||
-                apk.description.toLowerCase().includes(searchTerm)
-            );
-            meteStore.render();
-        });
     </script>
 </body>
 </html>
