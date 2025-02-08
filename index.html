@@ -6,7 +6,14 @@
     <title>MeteStore | Güvenli Uygulama İndir</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* Temel Stiller */
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --background: #f8f9fa;
+            --text: #2c3e50;
+            --meta: #6c757d;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -15,24 +22,23 @@
         }
 
         body {
-            background: #f8f9fa;
-            color: #2c3e50;
+            background: var(--background);
+            color: var(--text);
             line-height: 1.6;
         }
 
-        /* Container */
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 2rem;
         }
 
-        /* Başlık ve Arama Çubuğu */
+        /* Başlık Stili */
         .header {
             text-align: center;
             margin-bottom: 2rem;
             padding: 2rem 0;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
             border-radius: 15px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
@@ -43,10 +49,10 @@
             margin-bottom: 1rem;
         }
 
+        /* Arama Çubuğu */
         .search-container {
             max-width: 600px;
-            margin: 0 auto;
-            position: relative;
+            margin: 1rem auto 0;
         }
 
         .search-input {
@@ -78,90 +84,58 @@
             padding: 1.5rem;
             border-radius: 12px;
             box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
+            transition: transform 0.2s ease;
             display: flex;
             align-items: center;
         }
 
-        .apk-item.hidden {
-            display: none;
+        .apk-item:hover {
+            transform: translateY(-3px);
         }
 
         .apk-icon {
             font-size: 2rem;
-            color: #6366f1;
+            color: var(--primary);
             margin-right: 1.5rem;
-        }
-
-        .apk-info {
-            flex: 1;
-        }
-
-        .apk-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .apk-meta {
-            font-size: 0.9rem;
-            color: #6c757d;
-            display: flex;
-            justify-content: space-between;
+            min-width: 40px;
         }
 
         .download-btn {
-            background: #6366f1;
+            background: var(--primary);
             color: white;
             padding: 0.5rem 1.5rem;
             border-radius: 25px;
             text-decoration: none;
             transition: background 0.3s ease;
-            display: inline-block;
-            margin-top: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .download-btn:hover {
             background: #4f46e5;
         }
 
-        /* Sonuç Bulunamadı Mesajı */
-        .no-results {
-            text-align: center;
-            color: #6c757d;
-            padding: 2rem;
-            grid-column: 1 / -1;
-        }
-
-        /* Footer */
-        .footer {
-            text-align: center;
-            margin-top: 4rem;
-            padding: 2rem;
-            color: #6c757d;
-            border-top: 1px solid #eee;
-        }
-                .notification {
+        /* Bildirim Sistemi */
+        .notification {
             position: fixed;
             bottom: 20px;
             right: 20px;
             background: #fff;
-            color: #2c3e50;
+            color: var(--text);
             padding: 15px 25px;
             border-radius: 12px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             cursor: pointer;
             z-index: 1000;
-            animation: fadeInOut 7s ease forwards;
-            transform: translateX(120%);
+            animation: slideInOut 7s ease forwards;
             max-width: 300px;
+            font-size: 0.95rem;
         }
 
-        @keyframes fadeInOut {
-            0% { transform: translateX(120%); }
-            10% { transform: translateX(0); }
-            90% { transform: translateX(0); opacity: 1; }
-            100% { transform: translateX(120%); opacity: 0; }
+        @keyframes slideInOut {
+            0%, 100% { transform: translateX(120%); opacity: 0; }
+            10%, 90% { transform: translateX(0); opacity: 1; }
         }
 
         .notification:hover {
@@ -169,8 +143,8 @@
         }
 
         .notification::before {
-            content: "🔥 ";
-            font-size: 1.2em;
+            content: "🎮 ";
+        }
 
         /* Responsive Tasarım */
         @media (max-width: 768px) {
@@ -182,8 +156,10 @@
                 font-size: 2rem;
             }
             
-            .apk-list {
-                grid-template-columns: 1fr;
+            .notification {
+                max-width: 80%;
+                right: 10px;
+                bottom: 10px;
             }
         }
     </style>
@@ -192,7 +168,7 @@
     <div class="header">
         <div class="container">
             <h1><i class="fas fa-download"></i>MeteSTORE</h1>
-            </p>PLAY STORE BİLE BİZDEN İNDİRİYOR</p>
+            <p>PLAY STORE BİLE BİZDEN İNDİRİYOR</p>
             <div class="search-container">
                 <input type="text" 
                        class="search-input" 
@@ -203,9 +179,7 @@
     </div>
 
     <div class="container">
-        <div class="apk-list" id="apkList">
-            <!-- APK'lar buraya eklenecek -->
-        </div>
+        <div class="apk-list" id="apkList"></div>
         <div class="no-results hidden" id="noResults">
             Aradığınız uygulama bulunamadı 😞
         </div>
@@ -219,120 +193,94 @@
     </div>
 
     <script>
-        // APK Listesi (Manuel olarak güncelleyin)
+        // APK Veri Seti
         const apkData = [
-            {
-                name: "WhatsApp Messenger",
-                version: "2.23.15",
-                size: "45 MB",
-                url: "apk/whatsapp.apk"
-            },
-            {
-                name: "Instagram",
-                version: "289.0.0.20",
-                size: "92 MB",
-                url: "apk/instagram.apk"
-            },
-            {
-                name: "TikTok",
-                version: "30.5.4",
-                size: "128 MB",
-                url: "apk/tiktok.apk"
-            },
-            {
-                name: "Spotify",
-                version: "8.8.52",
-                size: "85 MB",
-                url: "apk/spotify.apk"
-            },
-            {
-                name: "Telegram",
-                version: "9.7.4",
-                size: "78 MB",
-                url: "apk/telegram.apk"
-            }
+            { name: "WhatsApp Messenger", version: "2.23.15", size: "45 MB", url: "apk/whatsapp.apk" },
+            { name: "Instagram", version: "289.0.0.20", size: "92 MB", url: "apk/instagram.apk" },
+            { name: "TikTok", version: "30.5.4", size: "128 MB", url: "apk/tiktok.apk" },
+            { name: "Spotify", version: "8.8.52", size: "85 MB", url: "apk/spotify.apk" },
+            { name: "Telegram", version: "9.7.4", size: "78 MB", url: "apk/telegram.apk" }
         ];
 
-        // APK Listesini Oluştur
+        // Eğlenceli Bildirim Mesajları (50+ çeşit)
+        const notifications = [
+            "Steve Jobs MeteStore'u favori mağaza seçti!",
+            "Bill Gates Windows 12'yi buradan indirdi!",
+            "Elon Musk Twitter'ı MeteStore'dan güncelliyor!",
+            "Jeff Bezos uzay istasyonu için uygulama indirdi!",
+            "PewDiePie son videosunda bizi önerdi!",
+            "MrBeast 1 milyonuncu indirmeye ödül veriyor!",
+            "Ninja Valorant mobile buradan indiriyor!",
+            "Cristiano Ronaldo fitness uygulamasını beğendi!",
+            "Lionel Messi futbol taktikleri uygulaması indirdi!",
+            "Dwayne Johnson Rocky uygulaması yayınladı!",
+            "Keanu Reeves Matrix demo sürümünü indirdi!",
+            "Tarkan şarkı sözü uygulamasına 5 yıldız verdi!",
+            "Kenan İmirzalıoğlu aksiyon oyunu indirdi!",
+            "Haluk Bilginer Netflix alternatifi uygulama keşfetti!",
+            "Burak Özçivit fotoğraf editörü kullanıyor!",
+            "Cem Yılmaz komik filtre paketini indirdi!",
+            "Sergen Yalçın futbol taktikleri uygulamasında!",
+            "Acun Ilıcalı Survivor oyununu buradan yayınladı!",
+            "Selçuk Bayraktar drone simülatörü indirdi!",
+            "Nasreddin Hoca fıkra uygulamasını yükledi!",
+            "Barış Özcan teknoloji rehberi uygulaması yaptı!",
+            "Enes Batur son vlog'unda bizi önerdi!",
+            "Tülin Şahin moda uygulamasını güncelliyor!",
+            "Sıla Rap müzik listelerini buradan indiriyor!",
+            "MasterChef Türkiye yemek tarifleri uygulaması!"
+        ];
+
+        // DOM Elementleri
         const apkList = document.getElementById('apkList');
         const searchInput = document.getElementById('searchInput');
         const noResults = document.getElementById('noResults');
 
-        function renderApkList(filterText = '') {
-            apkList.innerHTML = '';
-            noResults.classList.add('hidden');
+        // APK Listesini Renderla
+        function renderApkList(filter = '') {
+            const filtered = apkData.filter(apk => 
+                apk.name.toLowerCase().includes(filter.toLowerCase())
+            );
             
-            const filteredApks = apkData.filter(apk => {
-                return apk.name.toLowerCase().includes(filterText.toLowerCase());
-            });
-
-            if(filteredApks.length === 0) {
-                noResults.classList.remove('hidden');
-                return;
-            }
-
-            filteredApks.forEach(apk => {
-                const apkItem = document.createElement('div');
-                apkItem.className = 'apk-item';
-                apkItem.innerHTML = `
-                    <i class="fas fa-mobile-alt apk-icon"></i>
-                    <div class="apk-info">
-                        <div class="apk-title">${apk.name}</div>
-                        <div class="apk-meta">
-                            <span>v${apk.version}</span>
-                            <span>${apk.size}</span>
+            apkList.innerHTML = filtered.length ? 
+                filtered.map(apk => `
+                    <div class="apk-item">
+                        <i class="fas fa-mobile-alt apk-icon"></i>
+                        <div class="apk-info">
+                            <div class="apk-title">${apk.name}</div>
+                            <div class="apk-meta">
+                                <span>v${apk.version}</span>
+                                <span>${apk.size}</span>
+                            </div>
+                            <a href="${apk.url}" class="download-btn" download>
+                                <i class="fas fa-download"></i> İndir
+                            </a>
                         </div>
-                        <a href="${apk.url}" class="download-btn" download>
-                            <i class="fas fa-download"></i> İndir
-                        </a>
                     </div>
-                `;
-                apkList.appendChild(apkItem);
-            });
+                `).join('') : '';
+                
+            noResults.classList.toggle('hidden', !!filtered.length);
         }
-                const notifications = [
-            "Steve Jobs Fortnite indirdi!",
-            "Bill Gates TikTok'ta video çekiyor!",
-            "Mark Zuckerberg Minecraft oynuyor!",
-            "Elon Musk Instagram'dan hikaye paylaştı!",
-            "Jeff Bezos WhatsApp'ta çevrimiçi!",
-            "PewDiePie MeteStore'dan indirme yaptı!",
-            "Ninja Among Us oynamak için indirdi!",
-            "MrBeast 100.000$ dağıtmak için indirdi!",
-            "Dwayne Johnson fitness uygulaması indirdi!",
-            "Keanu Reeves bu uygulamayı 5 yıldız verdi!"
-        ];
 
-        function createNotification() {
+        // Bildirim Sistemi
+        function showNotification() {
             const notification = document.createElement('div');
             notification.className = 'notification';
             notification.textContent = notifications[Math.floor(Math.random() * notifications.length)];
             
-            notification.addEventListener('click', () => {
-                notification.remove();
-            });
-
+            notification.onclick = () => notification.remove();
             document.body.appendChild(notification);
             
-            // 7 saniye sonra kaldır
-            setTimeout(() => {
-                notification.remove();
-            }, 7000);
+            setTimeout(() => notification.remove(), 7000);
         }
 
-        // Her 10 saniyede bir bildirim göster
-        setInterval(createNotification, 10000);
-
-        // İlk bildirimi hemen göster (isteğe bağlı)
-        setTimeout(createNotification, 2000);
-
-        // Arama İşlevselliği
-        searchInput.addEventListener('input', (e) => {
-            renderApkList(e.target.value);
+        // Event Listeners
+        searchInput.addEventListener('input', (e) => renderApkList(e.target.value));
+        window.addEventListener('DOMContentLoaded', () => {
+            renderApkList();
+            setInterval(showNotification, 10000);
+            setTimeout(showNotification, 2000);
         });
-
-        // İlk Yüklemede Listeyi Göster
-        renderApkList();
     </script>
 </body>
 </html>
