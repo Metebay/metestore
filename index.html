@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APK İndirme</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>APK Dosyaları</h1>
+        <ul id="apk-list">
+            <!-- APK'lar JavaScript ile buraya eklenecek -->
+        </ul>
+    </div>
+
+    <script>
+        // APK'ları MANUEL olarak bu diziye ekleyin!
+        const apkListesi = [
+           "apk/VideoPlatformu.apk"
+        ];
+
+        // Listeyi otomatik oluştur
+        const listElement = document.getElementById("apk-list");
+        apkListesi.forEach(apk => {
+            const fileName = apk.split("/").pop(); // Dosya adını al (ör: "app1.apk")
+            listElement.innerHTML += `
+                <li>
+                    <a href="${apk}" download>${fileName}</a>
+                </li>
+            `;
+        });
+    </script>
+</body>
+</html>
