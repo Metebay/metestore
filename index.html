@@ -52,112 +52,149 @@
             padding: 4rem 0;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
 
         .search-container {
             max-width: 600px;
-            margin: 1rem auto 0;
+            margin: 2rem auto 0;
+            position: relative;
         }
 
         .search-input {
             width: 100%;
-            padding: 12px 20px;
+            padding: 15px 25px;
             border: none;
             border-radius: 30px;
-            font-size: 1rem;
-            background: rgba(255,255,255,0.9);
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            font-size: 1.1rem;
+            background: rgba(255,255,255,0.95);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: 0 6px 25px rgba(99, 102, 241, 0.2);
         }
 
         .apk-list {
             display: grid;
-            gap: 1.5rem;
+            gap: 2rem;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         }
 
         .apk-item {
             background: var(--background);
             border: 1px solid var(--border);
-            padding: 1.5rem;
-            border-radius: 15px;
-            transition: transform 0.2s ease;
+            padding: 2rem;
+            border-radius: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
+            overflow: hidden;
         }
 
         .apk-item:hover {
-            transform: translateY(-3px);
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.08);
+        }
+
+        .apk-item::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .apk-item:hover::after {
+            opacity: 1;
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 25px;
+            text-decoration: none;
+            margin-top: 1.5rem;
+            transition: transform 0.2s ease;
+        }
+
+        .download-btn:hover {
+            transform: scale(1.05);
         }
 
         .footer {
             background: var(--primary);
             color: white;
-            padding: 3rem 0;
+            padding: 2rem 0;
             margin-top: auto;
+            border-top: 1px solid rgba(255,255,255,0.1);
         }
 
         .footer-content {
             max-width: 1200px;
             margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            padding: 0 2rem;
-        }
-
-        .footer-section h3 {
-            margin-bottom: 1rem;
-            border-bottom: 2px solid rgba(255,255,255,0.1);
-            padding-bottom: 0.5rem;
-        }
-
-        .footer-links {
-            list-style: none;
-        }
-
-        .footer-links li {
-            margin-bottom: 0.5rem;
-        }
-
-        .footer-links a {
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .footer-links a:hover {
-            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
         }
 
         .social-icons {
             display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
+            gap: 1.5rem;
         }
 
         .social-icons a {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             color: white;
-            opacity: 0.8;
-            transition: opacity 0.3s ease;
+            opacity: 0.9;
+            transition: all 0.3s ease;
         }
 
         .social-icons a:hover {
             opacity: 1;
+            transform: translateY(-2px);
         }
 
         .copyright {
             text-align: center;
-            margin-top: 2rem;
-            padding-top: 2rem;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 3rem 1rem;
+                border-radius: 0;
+            }
+            
+            .apk-item {
+                padding: 1.5rem;
+            }
+            
+            .social-icons {
+                gap: 1rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="header">
         <div class="container">
-            <h1><i class="fas fa-download"></i> MeteSTORE</h1>
-            <p>Güvenli ve Hızlı Uygulama İndirme Platformu</p>
+            <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">
+                <i class="fas fa-download"></i> MeteSTORE
+            </h1>
+            <p style="font-size: 1.1rem; opacity: 0.95;">Güvenli Uygulama İndirme Platformu</p>
             <div class="search-container">
                 <input type="text" 
                        class="search-input" 
@@ -169,116 +206,93 @@
 
     <div class="container">
         <div class="apk-list" id="apkList"></div>
-        <div class="no-results hidden" id="noResults">
-            Aradığınız uygulama bulunamadı
-        </div>
     </div>
 
     <footer class="footer">
         <div class="footer-content">
-            <div class="footer-section">
-                <h3>Hakkımızda</h3>
-                <p>MeteStore, kullanıcıların güvenli ve hızlı bir şekilde uygulama indirebileceği modern bir platformdur.</p>
+            <div class="social-icons">
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
             </div>
-            
-            <div class="footer-section">
-                <h3>Bağlantılar</h3>
-                <ul class="footer-links">
-                    <li><a href="#">Gizlilik Politikası</a></li>
-                    <li><a href="#">Kullanım Şartları</a></li>
-                    <li><a href="#">SSS</a></li>
-                    <li><a href="#">İletişim</a></li>
-                </ul>
+            <div class="copyright">
+                © 2024 MeteStore - Tüm hakları saklıdır
             </div>
-            
-            <div class="footer-section">
-                <h3>Sosyal Medya</h3>
-                <div class="social-icons">
-                    <a href="#"><i class="fab fa-facebook"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-github"></i></a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="copyright">
-            <p>© 2024 MeteStore - Tüm hakları saklıdır</p>
         </div>
     </footer>
 
     <script>
         class MeteStore {
             constructor() {
-                this.apkData = JSON.parse(localStorage.getItem('apkData')) || this.getDefaultData();
-                this.init();
-            }
-
-            getDefaultData() {
-                return [
+                this.apkData = [
                     {
                         name: "WhatsApp Messenger",
                         version: "2.23.15",
                         size: "45 MB",
                         url: "#",
-                        description: "Güvenli mesajlaşma uygulaması",
-                        rating: 4.2
+                        description: "Güvenli mesajlaşma platformu",
+                        icon: "fab fa-whatsapp"
                     },
                     {
                         name: "Instagram",
                         version: "289.0.0.20",
                         size: "92 MB",
                         url: "#",
-                        description: "Sosyal medya platformu",
-                        rating: 4.5
+                        description: "Sosyal medya deneyimi",
+                        icon: "fab fa-instagram"
                     },
                     {
-                        name: "TikTok",
-                        version: "30.5.4",
-                        size: "128 MB",
+                        name: "Spotify",
+                        version: "8.8.52",
+                        size: "85 MB",
                         url: "#",
-                        description: "Kısa video platformu",
-                        rating: 4.0
+                        description: "Müzik dinleme platformu",
+                        icon: "fab fa-spotify"
                     }
                 ];
+                this.init();
             }
 
             init() {
                 this.render();
-                this.setupEventListeners();
+                this.setupSearch();
             }
 
             render() {
                 const apkList = document.getElementById('apkList');
                 apkList.innerHTML = this.apkData.map(apk => `
                     <div class="apk-item">
-                        <i class="fas fa-mobile-alt" style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem;"></i>
-                        <h2>${apk.name}</h2>
-                        <p>${apk.description}</p>
-                        <div class="meta-info">
+                        <i class="${apk.icon}" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                        <h2 style="margin-bottom: 0.5rem;">${apk.name}</h2>
+                        <p style="color: var(--meta); margin-bottom: 0.8rem;">${apk.description}</p>
+                        <div style="display: flex; justify-content: space-between; color: var(--meta); margin-bottom: 1.5rem;">
                             <span>v${apk.version}</span>
                             <span>${apk.size}</span>
                         </div>
-                        <a href="${apk.url}" class="download-btn" download>
-                            <i class="fas fa-download"></i> İndir
+                        <a href="${apk.url}" class="download-btn">
+                            <i class="fas fa-download"></i>
+                            Ücretsiz İndir
                         </a>
                     </div>
                 `).join('');
             }
 
-            setupEventListeners() {
-                document.getElementById('searchInput').addEventListener('input', (e) => {
-                    const searchTerm = e.target.value.toLowerCase();
-                    this.apkData = this.getDefaultData().filter(apk => 
-                        apk.name.toLowerCase().includes(searchTerm) ||
-                        apk.description.toLowerCase().includes(searchTerm)
+            setupSearch() {
+                const searchInput = document.getElementById('searchInput');
+                searchInput.addEventListener('input', (e) => {
+                    const term = e.target.value.toLowerCase();
+                    const filtered = this.apkData.filter(apk => 
+                        apk.name.toLowerCase().includes(term) || 
+                        apk.description.toLowerCase().includes(term)
                     );
+                    this.apkData = filtered.length ? filtered : this.apkData;
                     this.render();
                 });
             }
         }
 
-        const meteStore = new MeteStore();
+        new MeteStore();
     </script>
 </body>
 </html>
