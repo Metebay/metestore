@@ -3,32 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APK İndirme</title>
-    <link rel="stylesheet" href="style.css">
+    <title>APK Deposu | Güvenli Uygulama İndir</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Temel Stiller */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f8f9fa;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Başlık */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 0;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header i {
+            font-size: 2rem;
+            margin-right: 1rem;
+        }
+
+        /* APK Listesi */
+        .apk-list {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        .apk-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .apk-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .apk-icon {
+            font-size: 2rem;
+            color: #6366f1;
+            margin-right: 1.5rem;
+        }
+
+        .apk-info {
+            flex: 1;
+        }
+
+        .apk-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .apk-meta {
+            font-size: 0.9rem;
+            color: #6c757d;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .download-btn {
+            background: #6366f1;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: background 0.3s ease;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+
+        .download-btn:hover {
+            background: #4f46e5;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 4rem;
+            padding: 2rem;
+            color: #6c757d;
+            border-top: 1px solid #eee;
+        }
+
+        /* Responsive Tasarım */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .apk-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="header">
+        <div class="container">
+            <h1><i class="fas fa-download"></i>APK Deposu</h1>
+            <p>Güvenli ve Güncel Uygulamalar</p>
+        </div>
+    </div>
+
     <div class="container">
-        <h1>APK Dosyaları</h1>
-        <ul id="apk-list">
-            <!-- APK'lar JavaScript ile buraya eklenecek -->
-        </ul>
+        <div class="apk-list" id="apkList">
+            <!-- APK'lar buraya eklenecek -->
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="container">
+            <p>© 2023 APK Deposu - Tüm hakları saklıdır</p>
+            <p>Güvenli indirme garantisi</p>
+        </div>
     </div>
 
     <script>
-        // APK'ları MANUEL olarak bu diziye ekleyin!
-        const apkListesi = [
-           "apk/VideoPlatformu.apk"
+        // APK Listesi (Manuel olarak güncelleyin)
+        const apkData = [
+            {
+                name: "Video İzleme Platformu",
+                version: "1.1",
+                size: "5.5 MB",
+                url: "apk/VideoPlatformu.apk"
+            },
+            {
+                name: "Instagram",
+                version: "289.0.0.20",
+                size: "92 MB",
+                url: "apk/instagram.apk"
+            },
+            {
+                name: "TikTok",
+                version: "30.5.4",
+                size: "128 MB",
+                url: "apk/tiktok.apk"
+            }
         ];
 
-        // Listeyi otomatik oluştur
-        const listElement = document.getElementById("apk-list");
-        apkListesi.forEach(apk => {
-            const fileName = apk.split("/").pop(); // Dosya adını al (ör: "app1.apk")
-            listElement.innerHTML += `
-                <li>
-                    <a href="${apk}" download>${fileName}</a>
-                </li>
+        // APK Listesini Oluştur
+        const apkList = document.getElementById('apkList');
+        
+        apkData.forEach(apk => {
+            const apkItem = document.createElement('div');
+            apkItem.className = 'apk-item';
+            apkItem.innerHTML = `
+                <i class="fas fa-mobile-alt apk-icon"></i>
+                <div class="apk-info">
+                    <div class="apk-title">${apk.name}</div>
+                    <div class="apk-meta">
+                        <span>v${apk.version}</span>
+                        <span>${apk.size}</span>
+                    </div>
+                    <a href="${apk.url}" class="download-btn" download>
+                        <i class="fas fa-download"></i> İndir
+                    </a>
+                </div>
             `;
+            apkList.appendChild(apkItem);
         });
     </script>
 </body>
