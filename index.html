@@ -1,100 +1,104 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BAY DİGİTAL APP MARKET</title>
-    <!-- Tailwind CSS'i projemize dahil ediyoruz -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Google'dan modern bir font yüklüyoruz */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6; /* Açık gri arka plan */
-        }
-        /* Kartların üzerine gelince hafifçe büyüme efekti */
-        .app-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BAY DİGİTAL APP MARKET</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f9fafb;
+    }
+    .app-card {
+      transition: all 0.3s ease;
+    }
+    .app-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.08);
+    }
+  </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
 
-    <div class="container mx-auto px-4 py-8 md:py-12">
-        
-        <!-- Başlık Bölümü -->
-        <header class="text-center mb-8 md:mb-12">
-            <h1 class="text-4xl md:text-5xl font-bold text-gray-900">Uygulama Mağazası</h1>
-            <p class="mt-2 text-lg text-gray-600">En son uygulamalarımızı buradan güvenle indirebilirsiniz.</p>
-        </header>
+<body class="text-gray-800">
 
-        <!-- Arama Çubuğu -->
-        <div class="mb-8 max-w-lg mx-auto">
-            <input type="text" id="searchInput" placeholder="Uygulama ara..." class="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
-        </div>
+  <!-- Üst Banner -->
+  <header class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-12 shadow-lg">
+    <div class="container mx-auto px-6 text-center">
+      <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight">
+        BAY DİGİTAL APP MARKET
+      </h1>
+      <p class="mt-3 text-lg text-blue-100">
+        En yeni ve güvenilir uygulamaları tek tıkla indir.
+      </p>
+    </div>
+  </header>
 
-      <!-- Çarpım Tablosu Öğreniyorum Uygulama Kartı -->
-<div class="app-card rounded-2xl shadow-lg overflow-hidden flex flex-col transition-all duration-300 hover:shadow-2xl" id="carpimApp">
-    <!-- Uygulama ikonu -->
-    <div class="p-5 flex justify-center bg-white">
-        <img id="carpimIcon" src="apk/carpim.png" alt="Çarpım Tablosu Öğreniyorum İkonu"
-             class="w-24 h-24 md:w-32 md:h-32 rounded-3xl object-cover shadow-md border-4">
+  <!-- Ana İçerik -->
+  <main class="container mx-auto px-6 py-10">
+    <!-- Arama Kutusu -->
+    <div class="mb-10 max-w-xl mx-auto relative">
+      <input id="searchInput" type="text" placeholder="🔍 Uygulama ara..."
+        class="w-full py-3 pl-12 pr-4 bg-white border border-gray-200 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+        stroke-width="1.5" stroke="gray"
+        class="w-5 h-5 absolute left-4 top-3.5 text-gray-400">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M21 21l-4.35-4.35M17.25 10.5a6.75 6.75 0 11-13.5 0 6.75 6.75 0 0113.5 0z" />
+      </svg>
     </div>
 
-    <div class="p-5 pt-0 flex flex-col flex-grow">
-        <!-- Uygulama Adı -->
-        <h2 class="text-xl font-bold text-center" data-name="Çarpım Tablosu Öğreniyorum">
+    <!-- Uygulama Listesi -->
+    <section id="appList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+
+      <!-- Çarpım Tablosu Uygulaması -->
+      <div class="app-card bg-white rounded-2xl shadow-md overflow-hidden flex flex-col">
+        <div class="p-6 flex justify-center bg-gray-50">
+          <img src="apk/carpim.png" alt="Çarpım Tablosu Öğreniyorum"
+            class="w-28 h-28 md:w-32 md:h-32 rounded-2xl object-cover border-4 border-gray-200 shadow-sm">
+        </div>
+        <div class="px-6 pb-6 flex flex-col flex-grow">
+          <h2 class="text-xl font-semibold text-center mt-2" data-name="Çarpım Tablosu Öğreniyorum">
             Çarpım Tablosu Öğreniyorum
-        </h2>
-        <p class="text-sm mb-3 text-center font-medium opacity-80">Eğitim · Çocuklar için</p>
-
-        <!-- Açıklama -->
-        <p class="text-gray-700 text-sm mb-4 flex-grow text-center">
+          </h2>
+          <p class="text-sm text-center text-gray-500 mb-3">Eğitim · Çocuklar için</p>
+          <p class="text-gray-700 text-sm text-center mb-4 flex-grow">
             Renkli görseller ve eğlenceli testlerle çocukların çarpım tablosunu kolayca öğrenmesini sağlayan öğretici bir uygulama!
-        </p>
-
-        <div class="flex justify-between items-center text-xs text-gray-500 mb-4">
+          </p>
+          <div class="flex justify-between text-xs text-gray-500 mb-4">
             <span>Versiyon: 2.0</span>
             <span>Boyut: 12 MB</span>
-        </div>
-
-        <!-- İndirme Butonu -->
-        <a href="apk/carpim.apk" download id="downloadBtn"
-           class="mt-auto w-full text-white font-bold text-center py-3 px-4 rounded-lg transition-colors duration-300">
+          </div>
+          <a href="apk/carpim.apk" download
+            class="mt-auto bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-indigo-600 hover:to-blue-500 text-white font-semibold text-center py-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-xl">
             📲 Uygulamayı İndir
-        </a>
-    </div>
-</div>
+          </a>
+        </div>
+      </div>
 
-    <footer class="text-center py-6">
-        <p class="text-gray-500">&copy; 2025 Uygulama Mağazası. Tüm hakları saklıdır.</p>
-    </footer>
+    </section>
+  </main>
 
-    <script>
-        // Basit Arama Fonksiyonu
-        const searchInput = document.getElementById('searchInput');
-        const appList = document.getElementById('appList');
-        const appCards = appList.getElementsByClassName('app-card');
+  <!-- Alt Bilgi -->
+  <footer class="bg-gray-900 text-gray-400 text-center py-6 mt-10">
+    <p class="text-sm">&copy; 2025 <span class="font-semibold text-white">Bay Digital</span>. Tüm hakları saklıdır.</p>
+  </footer>
 
-        searchInput.addEventListener('keyup', function(event) {
-            const searchTerm = event.target.value.toLowerCase();
+  <script>
+    // Basit Arama Fonksiyonu
+    const searchInput = document.getElementById('searchInput');
+    const appList = document.getElementById('appList');
+    const appCards = appList.getElementsByClassName('app-card');
 
-            for (let i = 0; i < appCards.length; i++) {
-                const card = appCards[i];
-                // data-name özelliğinden uygulama adını alıyoruz
-                const appName = card.querySelector('h2').getAttribute('data-name').toLowerCase();
-                
-                if (appName.includes(searchTerm)) {
-                    card.style.display = 'flex'; // Kartı göster
-                } else {
-                    card.style.display = 'none'; // Kartı gizle
-                }
-            }
-        });
-    </script>
-
+    searchInput.addEventListener('keyup', function (event) {
+      const searchTerm = event.target.value.toLowerCase();
+      for (let i = 0; i < appCards.length; i++) {
+        const card = appCards[i];
+        const appName = card.querySelector('h2').getAttribute('data-name').toLowerCase();
+        card.style.display = appName.includes(searchTerm) ? 'flex' : 'none';
+      }
+    });
+  </script>
 </body>
 </html>
-
