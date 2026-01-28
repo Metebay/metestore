@@ -3,229 +3,373 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Harem Link Özel Takip</title>
+    <title>Canlı Serbest Piyasa Takip</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome İkonları -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background-color: #111827; color: #f3f4f6; }
-        .log-box { font-family: 'Courier New', Courier, monospace; font-size: 10px; }
-        .blink { animation: blinker 1.5s linear infinite; }
-        @keyframes blinker { 50% { opacity: 0; } }
+        body { background-color: #0f172a; color: #f1f5f9; font-family: 'Segoe UI', sans-serif; }
+        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .input-dark { background: #1e293b; border: 1px solid #334155; color: white; outline: none; transition: 0.2s; }
+        .input-dark:focus { border-color: #d97706; box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.2); }
+        
+        /* Animasyonlar */
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Fiyat Değişim Efektleri */
+        .flash-green { animation: flashGreen 1s; }
+        .flash-red { animation: flashRed 1s; }
+        @keyframes flashGreen { 0% { color: #4ade80; text-shadow: 0 0 10px #4ade80; } 100% { color: white; } }
+        @keyframes flashRed { 0% { color: #f87171; text-shadow: 0 0 10px #f87171; } 100% { color: white; } }
     </style>
 </head>
-<body class="min-h-screen p-4 pb-20">
+<body class="min-h-screen pb-20 selection:bg-amber-500/30">
 
-    <div class="max-w-md mx-auto">
-        
-        <!-- Üst Bilgi -->
-        <div class="bg-gray-800 rounded-xl p-4 border border-gray-700 shadow-lg mb-4">
-            <h1 class="text-amber-500 font-bold text-lg flex items-center gap-2 mb-2">
-                <i class="fa-solid fa-link"></i> Özel Link Takipçisi
-            </h1>
-            <div class="text-[10px] text-gray-400 truncate border-b border-gray-700 pb-2 mb-2">
-                Hedef: ...haremaltin.com/grafik?tip=altin&birim=CEYREK_YENI
-            </div>
-            
-            <!-- Durum Logları -->
-            <div id="status-log" class="log-box text-green-400 h-6 overflow-hidden">
-                Bağlantı bekleniyor...
-            </div>
-        </div>
+    <div class="max-w-md mx-auto p-4">
 
-        <!-- Fiyat Kartı -->
-        <div class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl p-6 border border-amber-500/30 text-center relative overflow-hidden mb-6">
-            <div class="absolute top-0 right-0 w-20 h-20 bg-amber-500/10 rounded-full blur-xl"></div>
-            
-            <p class="text-amber-500/80 text-xs font-bold uppercase tracking-widest mb-1">ÇEYREK ALTIN (YENİ)</p>
-            <div id="price-display" class="text-4xl font-mono font-bold text-white tracking-tight">--- ₺</div>
-            <div class="text-[10px] text-gray-500 mt-2 flex justify-center items-center gap-2">
-                <span id="last-update">Güncellenmedi</span>
-                <button onclick="fetchDirectLink()" class="bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-white">
-                    <i class="fa-solid fa-sync-alt"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- Varlık Listesi ve Toplam -->
-        <div class="bg-gray-800 rounded-xl p-4 border border-gray-700">
-            <div class="flex justify-between items-end mb-4">
-                <div>
-                    <div class="text-xs text-gray-400">Toplam Cüzdan</div>
-                    <div id="total-wealth" class="text-2xl font-bold font-mono text-green-400">0 ₺</div>
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6 sticky top-0 z-10 py-2 bg-[#0f172a]/90 backdrop-blur border-b border-slate-800">
+            <div>
+                <h1 class="text-lg font-bold text-amber-500 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-line"></i> Pro Piyasa
+                </h1>
+                <div class="flex items-center gap-2 text-[10px] text-gray-400 mt-1">
+                    <span id="status-dot" class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></span>
+                    <span id="last-update">Veri Bekleniyor...</span>
                 </div>
-                <!-- Varlık Ekleme Butonu -->
-                <button onclick="addAsset()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-2 rounded-lg text-xs font-bold">
-                    <i class="fa-solid fa-plus"></i> Ekle
-                </button>
+            </div>
+            <button onclick="toggleSettings()" class="p-2 rounded-lg bg-slate-800 text-gray-400 hover:text-white border border-slate-700 transition">
+                <i class="fa-solid fa-gear"></i>
+            </button>
+        </div>
+
+        <!-- Ayarlar (Spread) Paneli -->
+        <div id="settings-panel" class="hidden mb-6 bg-slate-800 p-4 rounded-xl border border-amber-500/30 shadow-2xl fade-in relative">
+            <h3 class="text-amber-500 text-xs font-bold uppercase mb-3 flex items-center gap-2">
+                <i class="fa-solid fa-sliders"></i> Piyasa Kalibrasyonu (Makas)
+            </h3>
+            <p class="text-[10px] text-slate-400 mb-4">
+                Uygulama serbest piyasa verisini çeker. Eğer kuyumcunuzun fiyatı ile ekran arasında fark varsa, buradan sabit fark ekleyebilirsiniz.
+            </p>
+            <div class="grid grid-cols-3 gap-3">
+                <div>
+                    <label class="text-[10px] text-slate-400 block mb-1">Has Altın (+TL)</label>
+                    <input type="number" id="spread-ga" value="0" oninput="updateSpread()" class="input-dark w-full rounded p-2 text-xs font-mono text-center">
+                </div>
+                <div>
+                    <label class="text-[10px] text-slate-400 block mb-1">Çeyrek (+TL)</label>
+                    <input type="number" id="spread-c" value="0" oninput="updateSpread()" class="input-dark w-full rounded p-2 text-xs font-mono text-center">
+                </div>
+                <div>
+                    <label class="text-[10px] text-slate-400 block mb-1">Dolar (+TL)</label>
+                    <input type="number" id="spread-usd" value="0" oninput="updateSpread()" class="input-dark w-full rounded p-2 text-xs font-mono text-center">
+                </div>
+            </div>
+            <div class="mt-3 text-[10px] text-center text-gray-500">Ayarlar otomatik kaydedilir.</div>
+        </div>
+
+        <!-- Fiyat Kartları -->
+        <div class="grid grid-cols-2 gap-3 mb-6">
+            <!-- Gram Altın -->
+            <div class="glass-panel p-3 rounded-xl border-l-2 border-amber-500 relative overflow-hidden group">
+                <div class="text-[10px] text-slate-400 font-bold uppercase flex justify-between">
+                    <span>Has Altın</span> <i class="fa-solid fa-coins text-amber-500/50"></i>
+                </div>
+                <div id="price-ga" class="text-xl font-mono font-bold text-white mt-1">---</div>
+                <div id="change-ga" class="text-[10px] mt-1 text-gray-500 flex justify-between">
+                    <span>%0.00</span>
+                    <span id="diff-ga" class="text-amber-500/70 hidden"></span>
+                </div>
             </div>
 
-            <div id="asset-list" class="space-y-2">
-                <!-- Varlıklar buraya gelecek -->
+            <!-- Çeyrek Altın -->
+            <div class="glass-panel p-3 rounded-xl border-l-2 border-amber-500 relative overflow-hidden group">
+                <div class="text-[10px] text-slate-400 font-bold uppercase flex justify-between">
+                    <span>Çeyrek (Y)</span> <i class="fa-solid fa-circle text-amber-500/50"></i>
+                </div>
+                <div id="price-c" class="text-xl font-mono font-bold text-white mt-1">---</div>
+                <div id="change-c" class="text-[10px] mt-1 text-gray-500 flex justify-between">
+                    <span>%0.00</span>
+                    <span id="diff-c" class="text-amber-500/70 hidden"></span>
+                </div>
+            </div>
+
+            <!-- Dolar -->
+            <div class="glass-panel p-3 rounded-xl border-l-2 border-green-500 relative overflow-hidden group">
+                <div class="text-[10px] text-slate-400 font-bold uppercase flex justify-between">
+                    <span>USD / TRY</span> <i class="fa-solid fa-dollar-sign text-green-500/50"></i>
+                </div>
+                <div id="price-usd" class="text-xl font-mono font-bold text-white mt-1">---</div>
+                <div id="change-usd" class="text-[10px] mt-1 text-gray-500 flex justify-between">
+                    <span>%0.00</span>
+                    <span id="diff-usd" class="text-green-500/70 hidden"></span>
+                </div>
+            </div>
+
+            <!-- Euro -->
+            <div class="glass-panel p-3 rounded-xl border-l-2 border-blue-500 relative overflow-hidden group">
+                <div class="text-[10px] text-slate-400 font-bold uppercase flex justify-between">
+                    <span>EUR / TRY</span> <i class="fa-solid fa-euro-sign text-blue-500/50"></i>
+                </div>
+                <div id="price-eur" class="text-xl font-mono font-bold text-white mt-1">---</div>
+                <div id="change-eur" class="text-[10px] mt-1 text-gray-500">
+                    <span>%0.00</span>
+                </div>
             </div>
         </div>
 
-        <div class="mt-4 text-[10px] text-gray-500 text-center">
-            Not: Fiyat doğrudan sayfanın &lt;title&gt; etiketinden okunur.
+        <!-- Toplam Varlık -->
+        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-900 to-slate-900 p-6 shadow-2xl border border-indigo-500/20 mb-6">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl"></div>
+            <div class="relative z-10">
+                <p class="text-indigo-200 text-xs font-bold uppercase tracking-widest mb-1">Net Varlık Değeri</p>
+                <h2 id="total-wealth" class="text-4xl font-bold font-mono tracking-tight text-white">0 ₺</h2>
+                <div class="mt-4 flex gap-2">
+                    <span class="bg-slate-900/50 px-3 py-1 rounded-full text-[10px] text-indigo-200 border border-indigo-500/30 flex items-center gap-1">
+                        <i class="fa-solid fa-wallet"></i> <span id="asset-count">0</span> Kalem Varlık
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ekleme Formu -->
+        <div class="bg-slate-800 rounded-xl p-1 border border-slate-700 flex gap-1 shadow-lg mb-4">
+            <select id="add-type" class="bg-slate-900 text-slate-200 text-sm rounded-lg px-2 py-3 border-r border-slate-700 outline-none focus:bg-slate-800">
+                <option value="GA">Has Altın</option>
+                <option value="C">Çeyrek</option>
+                <option value="USD">Dolar</option>
+                <option value="EUR">Euro</option>
+                <option value="TL">TL</option>
+            </select>
+            <input type="number" id="add-amount" placeholder="Miktar..." step="any" class="flex-1 bg-transparent text-white text-sm px-3 outline-none font-mono">
+            <button onclick="addAsset()" class="bg-amber-600 hover:bg-amber-500 text-white px-4 rounded-lg m-1 transition-colors shadow-lg">
+                <i class="fa-solid fa-plus"></i>
+            </button>
+        </div>
+
+        <!-- Varlık Listesi -->
+        <div id="asset-list" class="space-y-2">
+            <!-- JS ile dolacak -->
         </div>
 
     </div>
 
+    <!-- JAVASCRIPT MOTORU -->
     <script>
-        // Hedef Link (Senin verdiğin link)
-        const TARGET_URL = "https://www.haremaltin.com/grafik?tip=altin&birim=CEYREK_YENI";
+        // --- AYARLAR VE STATE ---
+        let assets = JSON.parse(localStorage.getItem('html_assets')) || [];
+        let spread = JSON.parse(localStorage.getItem('html_spread')) || { GA: 0, C: 0, USD: 0 };
         
-        let currentPrice = 0;
-        let assets = JSON.parse(localStorage.getItem('direct_assets')) || [];
-
-        const ui = {
-            price: document.getElementById('price-display'),
-            log: document.getElementById('status-log'),
-            updateTime: document.getElementById('last-update'),
-            total: document.getElementById('total-wealth'),
-            list: document.getElementById('asset-list')
+        // Piyasa Verileri (Başlangıç)
+        let rates = {
+            USD: { price: 0, change: 0 },
+            EUR: { price: 0, change: 0 },
+            GA:  { price: 0, change: 0 },
+            C:   { price: 0, change: 0 }
         };
 
-        // --- DOĞRUDAN LİNK TARAYICI ---
-        async function fetchDirectLink() {
-            ui.log.innerHTML = '<span class="blink">Sayfaya bağlanılıyor...</span>';
+        // --- UI BAŞLATMA ---
+        function init() {
+            // Spread inputlarını doldur
+            document.getElementById('spread-ga').value = spread.GA;
+            document.getElementById('spread-c').value = spread.C;
+            document.getElementById('spread-usd').value = spread.USD;
             
+            renderAssets();
+            fetchData();
+            
+            // 5 saniyede bir güncelle
+            setInterval(fetchData, 5000);
+        }
+
+        // --- VERİ MOTORU (GENELPARA API) ---
+        async function fetchData() {
+            const statusDot = document.getElementById('status-dot');
+            statusDot.classList.add('bg-yellow-500'); // Yükleniyor
+
             try {
-                // Cache önlemek için rastgele sayı ekliyoruz
-                const noCache = `&r=${Math.random()}`;
-                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(TARGET_URL + noCache)}`;
+                // AllOrigins Proxy üzerinden GenelPara'ya erişim
+                const proxy = 'https://api.allorigins.win/get?url=' + encodeURIComponent('https://api.genelpara.com/embed/altin.json');
+                const res = await fetch(proxy);
+                const json = await res.json();
                 
-                const response = await fetch(proxyUrl);
-                const data = await response.json();
+                if(!json.contents) throw new Error("Veri boş");
                 
-                if (!data.contents) throw new Error("Sayfa boş geldi");
+                const data = JSON.parse(json.contents);
 
-                const html = data.contents;
-                
-                // --- STRATEJİ: Sayfa Başlığını (Title) Oku ---
-                // Harem Grafik sayfalarının başlığı şöyledir: "Çeyrek Altın - 5.150,00 TL - Harem Altın"
-                // Bu en güvenilir yöntemdir çünkü JS yüklenmese bile title sunucudan gelir.
-                
-                // 1. Title etiketini bul
-                const titleMatch = html.match(/<title>(.*?)<\/title>/i);
-                let foundPrice = 0;
+                // Helper: String parayı sayıya çevir (1.250,50 -> 1250.50)
+                const parseMoney = (val) => parseFloat(val.replace(/\./g, '').replace(',', '.'));
 
-                if (titleMatch && titleMatch[1]) {
-                    const titleText = titleMatch[1];
-                    ui.log.innerText = `Başlık Okundu: ${titleText.substring(0, 30)}...`;
-                    
-                    // Başlık içindeki sayıları ayıkla (Örn: 5.150,50)
-                    // Regex: Nokta veya virgül içeren sayılar
-                    const numbers = titleText.match(/([0-9]{1,3}(?:\.[0-9]{3})*(?:,[0-9]+)?)/g);
-                    
-                    if (numbers) {
-                        // Genellikle en büyük sayı veya TL'den önceki sayı fiyattır.
-                        // Dizideki sayıları parse et, en mantıklısını (3000-10000 arası) al
-                        for(let numStr of numbers) {
-                            let val = parseFloat(numStr.replace(/\./g, '').replace(',', '.'));
-                            // Çeyrek altın mantık aralığı (2000 TL ile 15000 TL arası kabul edelim)
-                            if (val > 2000 && val < 15000) {
-                                foundPrice = val;
-                                break; 
-                            }
-                        }
-                    }
-                }
+                // Eski fiyatları tut (Animasyon için)
+                const oldRates = { ...rates };
 
-                // 2. YÖNTEM: Eğer Title'da yoksa Meta Description'a bak
-                if (foundPrice === 0) {
-                    const metaMatch = html.match(/name="description" content="(.*?)"/i);
-                    if (metaMatch) {
-                        const metaText = metaMatch[1];
-                        const numbers = metaText.match(/([0-9]{1,3}(?:\.[0-9]{3})*(?:,[0-9]+)?)/g);
-                        if(numbers) {
-                            let val = parseFloat(numbers[0].replace(/\./g, '').replace(',', '.'));
-                            if (val > 2000) foundPrice = val;
-                        }
-                    }
-                }
+                // Yeni verileri işle
+                rates.USD = { price: parseMoney(data['USD'].satis), change: data['USD'].degisim };
+                rates.EUR = { price: parseMoney(data['EUR'].satis), change: data['EUR'].degisim };
+                rates.GA  = { price: parseMoney(data['GA'].satis),  change: data['GA'].degisim };
+                rates.C   = { price: parseMoney(data['C'].satis),   change: data['C'].degisim };
 
-                // SONUÇ KONTROLÜ
-                if (foundPrice > 0) {
-                    currentPrice = foundPrice;
-                    ui.price.innerText = foundPrice.toLocaleString('tr-TR', {minimumFractionDigits: 2}) + ' ₺';
-                    ui.price.classList.add('text-green-400');
-                    ui.log.innerText = 'Veri başarıyla çekildi.';
-                    ui.log.className = 'log-box text-green-400';
-                    
-                    const d = new Date();
-                    ui.updateTime.innerText = d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0');
-                    
-                    renderAssets();
-                } else {
-                    throw new Error("Fiyat ayrıştırılamadı.");
-                }
+                // UI Güncelle
+                updatePriceCard('ga', rates.GA, spread.GA, oldRates.GA.price);
+                updatePriceCard('c', rates.C, spread.C, oldRates.C.price);
+                updatePriceCard('usd', rates.USD, spread.USD, oldRates.USD.price);
+                updatePriceCard('eur', rates.EUR, spread.USD, oldRates.EUR.price); // Euro'ya da USD makası (basitlik için)
 
-            } catch (error) {
-                console.error(error);
-                ui.log.innerText = 'Hata: ' + error.message;
-                ui.log.className = 'log-box text-red-400';
-                
-                // Hata durumunda eski fiyatı koru ama rengi değiştir
-                ui.price.classList.remove('text-green-400');
-                ui.price.classList.add('text-red-400');
+                // Zaman ve Durum
+                const d = new Date();
+                document.getElementById('last-update').innerText = `Canlı: ${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
+                statusDot.classList.remove('bg-yellow-500');
+                statusDot.classList.add('bg-green-500');
+
+                // Toplamı güncelle
+                renderAssets();
+
+            } catch (err) {
+                console.error("Hata:", err);
+                statusDot.classList.remove('bg-green-500');
+                statusDot.classList.add('bg-red-500');
             }
         }
 
-        // --- CÜZDAN YÖNETİMİ ---
-        function renderAssets() {
-            ui.list.innerHTML = '';
-            let total = 0;
+        // --- KART GÜNCELLEME VE ANİMASYON ---
+        function updatePriceCard(id, rateData, spreadVal, oldPrice) {
+            const finalPrice = rateData.price + parseFloat(spreadVal);
+            const elPrice = document.getElementById(`price-${id}`);
+            const elChange = document.getElementById(`change-${id}`);
+            const elDiff = document.getElementById(`diff-${id}`);
 
-            if(assets.length === 0) {
-                ui.list.innerHTML = '<div class="text-center text-gray-600 text-xs py-4">Henüz çeyrek altın eklemediniz.</div>';
+            // Fiyatı Yaz
+            elPrice.innerText = finalPrice.toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+            // Değişim Yüzdesi Rengi
+            const changeVal = parseFloat(rateData.change);
+            const changeHtml = `<span class="${changeVal >= 0 ? 'text-green-500' : 'text-red-500'}">%${rateData.change}</span>`;
+            
+            // Makas Göstergesi
+            if(spreadVal > 0) {
+                elDiff.innerText = `+${spreadVal} Fark`;
+                elDiff.classList.remove('hidden');
+                elChange.innerHTML = `${changeHtml}`; // Makas varsa sadece değişim kalsın, fark sağda
+            } else {
+                elDiff.classList.add('hidden');
+                elChange.innerHTML = changeHtml;
             }
 
-            assets.forEach((item, index) => {
-                const val = item.amount * currentPrice;
-                total += val;
+            // Flash Animasyonu (Fiyat değiştiyse)
+            elPrice.classList.remove('flash-green', 'flash-red');
+            void elPrice.offsetWidth; // Reflow tetikle
+            
+            if(finalPrice > (oldPrice + parseFloat(spreadVal))) {
+                elPrice.classList.add('flash-green');
+            } else if (finalPrice < (oldPrice + parseFloat(spreadVal))) {
+                elPrice.classList.add('flash-red');
+            }
+        }
 
-                const div = document.createElement('div');
-                div.className = 'flex justify-between items-center bg-gray-700 p-3 rounded-lg border border-gray-600';
-                div.innerHTML = `
+        // --- PORTFÖY YÖNETİMİ ---
+        function getCalculatedPrice(type) {
+            if (type === 'GA') return rates.GA.price + spread.GA;
+            if (type === 'C') return rates.C.price + spread.C;
+            if (type === 'USD') return rates.USD.price + spread.USD;
+            if (type === 'EUR') return rates.EUR.price + spread.USD;
+            if (type === 'TL') return 1;
+            return 0;
+        }
+
+        function renderAssets() {
+            const list = document.getElementById('asset-list');
+            list.innerHTML = '';
+            let totalWealth = 0;
+
+            assets.forEach((asset, index) => {
+                const unitPrice = getCalculatedPrice(asset.type);
+                const totalVal = asset.amount * unitPrice;
+                totalWealth += totalVal;
+
+                let iconClass = 'fa-coins text-amber-500';
+                let label = 'Adet';
+                if(asset.type === 'USD') { iconClass = 'fa-dollar-sign text-green-500'; label = '$'; }
+                if(asset.type === 'EUR') { iconClass = 'fa-euro-sign text-blue-500'; label = '€'; }
+                if(asset.type === 'TL') { iconClass = 'fa-lira-sign text-gray-400'; label = '₺'; }
+                if(asset.type === 'GA') { label = 'Gr'; }
+
+                const row = document.createElement('div');
+                row.className = 'group bg-slate-800 hover:bg-slate-750 p-4 rounded-xl border border-slate-700/50 flex justify-between items-center transition-all';
+                row.innerHTML = `
                     <div class="flex items-center gap-3">
-                        <div class="bg-amber-500 text-slate-900 w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs">Ç</div>
+                        <div class="w-10 h-10 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center text-lg">
+                            <i class="fa-solid ${iconClass}"></i>
+                        </div>
                         <div>
-                            <div class="text-sm font-bold text-gray-200">${item.amount} Adet</div>
-                            <div class="text-[10px] text-gray-400">Yeni Çeyrek</div>
+                            <div class="font-bold text-slate-100 text-lg flex items-baseline gap-1">
+                                ${asset.amount} <span class="text-xs text-slate-500 font-normal">${label}</span>
+                            </div>
+                            <div class="text-[10px] text-slate-500 font-mono">
+                                Birim: ${unitPrice.toLocaleString('tr-TR', {maximumFractionDigits: 0})} ₺
+                            </div>
                         </div>
                     </div>
                     <div class="text-right">
-                        <div class="text-sm font-bold font-mono">${val.toLocaleString('tr-TR', {maximumFractionDigits:0})} ₺</div>
-                        <button onclick="removeAsset(${index})" class="text-[10px] text-red-400 hover:text-red-300">Sil</button>
+                        <div class="font-mono font-bold text-lg text-slate-200">
+                            ${totalVal.toLocaleString('tr-TR', {maximumFractionDigits: 0})} ₺
+                        </div>
+                        <button onclick="removeAsset(${index})" class="text-[10px] text-red-400 hover:text-red-300 opacity-0 group-hover:opacity-100 transition-opacity mt-1">
+                            Kaldır
+                        </button>
                     </div>
                 `;
-                ui.list.appendChild(div);
+                list.appendChild(row);
             });
 
-            ui.total.innerText = total.toLocaleString('tr-TR', {maximumFractionDigits:0}) + ' ₺';
+            if(assets.length === 0) {
+                list.innerHTML = '<div class="text-center py-6 opacity-50 text-sm">Henüz varlık eklemediniz.</div>';
+            }
+
+            document.getElementById('total-wealth').innerText = totalWealth.toLocaleString('tr-TR', {maximumFractionDigits: 0}) + ' ₺';
+            document.getElementById('asset-count').innerText = assets.length;
         }
 
         function addAsset() {
-            const amount = prompt("Kaç adet Yeni Çeyrek Altın eklemek istiyorsunuz?");
-            if (amount && !isNaN(amount)) {
-                assets.push({ amount: parseFloat(amount) });
-                localStorage.setItem('direct_assets', JSON.stringify(assets));
+            const type = document.getElementById('add-type').value;
+            const amount = parseFloat(document.getElementById('add-amount').value);
+            
+            if(amount > 0) {
+                assets.unshift({ type, amount });
+                localStorage.setItem('html_assets', JSON.stringify(assets));
+                document.getElementById('add-amount').value = '';
                 renderAssets();
             }
         }
 
-        function removeAsset(index) {
+        window.removeAsset = (index) => {
             if(confirm('Silmek istiyor musunuz?')) {
                 assets.splice(index, 1);
-                localStorage.setItem('direct_assets', JSON.stringify(assets));
+                localStorage.setItem('html_assets', JSON.stringify(assets));
                 renderAssets();
             }
+        };
+
+        // --- ETKİLEŞİM ---
+        function toggleSettings() {
+            const el = document.getElementById('settings-panel');
+            el.classList.toggle('hidden');
         }
 
-        // --- BAŞLATMA ---
-        fetchDirectLink();
-        // 30 saniyede bir sayfayı tekrar kontrol et
-        setInterval(fetchDirectLink, 30000);
+        function updateSpread() {
+            spread.GA = parseFloat(document.getElementById('spread-ga').value) || 0;
+            spread.C = parseFloat(document.getElementById('spread-c').value) || 0;
+            spread.USD = parseFloat(document.getElementById('spread-usd').value) || 0;
+            
+            localStorage.setItem('html_spread', JSON.stringify(spread));
+            
+            // Fiyatları hemen güncelle
+            fetchData(); 
+        }
+
+        // Başlat
+        init();
 
     </script>
 </body>
