@@ -9,33 +9,365 @@
     <!-- FontAwesome (İkonlar için) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Özel Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #1f2937; }
-        ::-webkit-scrollbar-thumb { background: #d97706; border-radius: 3px; }
-        
-        /* Animasyonlar */
-        .fade-in { animation: fadeIn 0.5s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
+        <!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harem Link Özel Takip</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
         body { background-color: #111827; color: #f3f4f6; }
+        .log-box { font-family: 'Courier New', Courier, monospace; font-size: 10px; }
+        .blink { animation: blinker 1.5s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
     </style>
 </head>
-<body class="font-sans antialiased min-h-screen pb-20">
+<body class="min-h-screen p-4 pb-20">
 
-    <!-- Ana Konteyner -->
-    <div class="max-w-md mx-auto p-4">
-
-        <!-- Başlık ve Kontroller -->
-        <div class="flex justify-between items-center mb-6 mt-2">
-            <div>
-                <h1 class="text-xl font-bold text-amber-500 flex items-center gap-2">
-                    <i class="fas fa-wallet"></i> Altın Cüzdan
-                </h1>
-                <div id="status-indicator" class="text-[10px] text-gray-500 mt-1 flex items-center gap-1 font-mono">
-                    <i class="fas fa-circle-notch fa-spin"></i> Yükleniyor...
-                </div>
+    <div class="max-w-md mx-auto">
+        
+        <!-- Üst Bilgi -->
+        <div class="bg-gray-800 rounded-xl p-4 border border-gray-700 shadow-lg mb-4">
+            <h1 class="text-amber-500 font-bold text-lg flex items-center gap-2 mb-2">
+                <i class="fa-solid fa-link"></i> Özel Link Takipçisi
+            </h1>
+            <div class="text-[10px] text-gray-400 truncate border-b border-gray-700 pb-2 mb-2">
+                Hedef: ...haremaltin.com/grafik?tip=altin&birim=CEYREK_YENI
             </div>
+            
+            <!-- Durum Logları -->
+            <div id="status-log" class="log-box text-green-400 h-6 overflow-hidden">
+                Bağlantı bekleniyor...
+            </div>
+        </div>
+
+        <!-- Fiyat Kartı -->
+        <div class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl p-6 border border-amber-500/30 text-center relative overflow-hidden mb-6">
+            <div class="absolute top-0 right-0 w-20 h-20 bg-amber-500/10 rounded-full blur-xl"></div>
+            
+            <p class="text-amber-500/80 text-xs font-bold uppercase tracking-widest mb-1">ÇEYREK ALTIN (YENİ)</p>
+            <div id="price-display" class="text-4xl font-mono font-bold text-white tracking-tight">--- ₺</div>
+            <div class="text-[10px] text-gray-500 mt-2 flex justify-center items-center gap-2">
+                <span id="last-update">Güncellenmedi</span>
+                <button onclick="fetchDirectLink()" class="bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-white">
+                    <i class="fa-solid fa-sync-alt"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Varlık Listesi ve Toplam -->
+        <div class="bg-gray-800 rounded-xl p-4 border border-gray-700">
+            <div class="flex justify-between items-end mb-4">
+                <div>
+                    <div class="text-xs text-gray-400">Toplam Cüzdan</div>
+                    <div id="total-wealth" class="text-2xl font-bold font-mono text-green-400">0 ₺</div>
+                </div>
+                <!-- Varlık Ekleme Butonu -->
+                <button onclick="addAsset()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-2 rounded-lg text-xs font-bold">
+                    <i class="fa-solid fa-plus"></i> Ekle
+                </button>
+            </div>
+
+            <div id="asset-list" class="space-y-2">
+                <!-- Varlıklar buraya gelecek -->
+            </div>
+        </div>
+
+        <div class="mt-4 text-[10px] text-gray-500 text-center">
+            Not: Fiyat doğrudan sayfanın &lt;title&gt; etiketinden okunur.
+        </div>
+
+    </div>
+
+    <script>
+        // Hedef Link (Senin verdiğin link)
+        const TARGET_URL = "https://www.haremaltin.com/grafik?tip=altin&birim=CEYREK_YENI";
+        
+        let currentPrice = 0;
+        let assets = JSON.parse(localStorage.getItem('direct_assets')) || [];
+
+        const ui = {
+            price: document.getElementById('price-display'),
+            log: document.getElementById('status-log'),
+            updateTime: document.getElementById('last-update'),
+            total: document.getElementById('total-wealth'),
+            list: document.getElementById('asset-list')
+        };
+
+        // --- DOĞRUDAN LİNK TARAYICI ---
+        async function fetchDirectLink() {
+            ui.log.innerHTML = '<span class="blink">Sayfaya bağlanılıyor...</span>';
+            
+            try {
+                // Cache önlemek için rastgele sayı ekliyoruz
+                const noCache = `&r=${Math.random()}`;
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(TARGET_URL + noCache)}`;
+                
+                const response = await fetch(proxyUrl);
+                const data = await response.json();
+                
+                if (!data.contents) throw new Error("Sayfa boş geldi");
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harem Link Özel Takip</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #111827; color: #f3f4f6; }
+        .log-box { font-family: 'Courier New', Courier, monospace; font-size: 10px; }
+        .blink { animation: blinker 1.5s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
+    </style>
+</head>
+<body class="min-h-screen p-4 pb-20">
+
+    <div class="max-w-md mx-auto">
+        
+        <!-- Üst Bilgi -->
+        <div class="bg-gray-800 rounded-xl p-4 border border-gray-700 shadow-lg mb-4">
+            <h1 class="text-amber-500 font-bold text-lg flex items-center gap-2 mb-2">
+                <i class="fa-solid fa-link"></i> Özel Link Takipçisi
+            </h1>
+            <div class="text-[10px] text-gray-400 truncate border-b border-gray-700 pb-2 mb-2">
+                Hedef: ...haremaltin.com/grafik?tip=altin&birim=CEYREK_YENI
+            </div>
+            
+            <!-- Durum Logları -->
+            <div id="status-log" class="log-box text-green-400 h-6 overflow-hidden">
+                Bağlantı bekleniyor...
+            </div>
+        </div>
+
+        <!-- Fiyat Kartı -->
+        <div class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl p-6 border border-amber-500/30 text-center relative overflow-hidden mb-6">
+            <div class="absolute top-0 right-0 w-20 h-20 bg-amber-500/10 rounded-full blur-xl"></div>
+            
+            <p class="text-amber-500/80 text-xs font-bold uppercase tracking-widest mb-1">ÇEYREK ALTIN (YENİ)</p>
+            <div id="price-display" class="text-4xl font-mono font-bold text-white tracking-tight">--- ₺</div>
+            <div class="text-[10px] text-gray-500 mt-2 flex justify-center items-center gap-2">
+                <span id="last-update">Güncellenmedi</span>
+                <button onclick="fetchDirectLink()" class="bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-white">
+                    <i class="fa-solid fa-sync-alt"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Varlık Listesi ve Toplam -->
+        <div class="bg-gray-800 rounded-xl p-4 border border-gray-700">
+            <div class="flex justify-between items-end mb-4">
+                <div>
+                    <div class="text-xs text-gray-400">Toplam Cüzdan</div>
+                    <div id="total-wealth" class="text-2xl font-bold font-mono text-green-400">0 ₺</div>
+                </div>
+                <!-- Varlık Ekleme Butonu -->
+                <button onclick="addAsset()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-2 rounded-lg text-xs font-bold">
+                    <i class="fa-solid fa-plus"></i> Ekle
+                </button>
+            </div>
+
+            <div id="asset-list" class="space-y-2">
+                <!-- Varlıklar buraya gelecek -->
+            </div>
+        </div>
+
+        <div class="mt-4 text-[10px] text-gray-500 text-center">
+            Not: Fiyat doğrudan sayfanın &lt;title&gt; etiketinden okunur.
+        </div>
+
+    </div>
+
+    <script>
+        // Hedef Link (Senin verdiğin link)
+        const TARGET_URL = "https://www.haremaltin.com/grafik?tip=altin&birim=CEYREK_YENI";
+        
+        let currentPrice = 0;
+        let assets = JSON.parse(localStorage.getItem('direct_assets')) || [];
+
+        const ui = {
+            price: document.getElementById('price-display'),
+            log: document.getElementById('status-log'),
+            updateTime: document.getElementById('last-update'),
+            total: document.getElementById('total-wealth'),
+            list: document.getElementById('asset-list')
+        };
+
+        // --- DOĞRUDAN LİNK TARAYICI ---
+        async function fetchDirectLink() {
+            ui.log.innerHTML = '<span class="blink">Sayfaya bağlanılıyor...</span>';
+            
+            try {
+                // Cache önlemek için rastgele sayı ekliyoruz
+                const noCache = `&r=${Math.random()}`;
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(TARGET_URL + noCache)}`;
+                
+                const response = await fetch(proxyUrl);
+                const data = await response.json();
+                
+                if (!data.contents) throw new Error("Sayfa boş geldi");
+
+                const html = data.contents;
+                
+                // --- STRATEJİ: Sayfa Başlığını (Title) Oku ---
+                // Harem Grafik sayfalarının başlığı şöyledir: "Çeyrek Altın - 5.150,00 TL - Harem Altın"
+                // Bu en güvenilir yöntemdir çünkü JS yüklenmese bile title sunucudan gelir.
+                
+                // 1. Title etiketini bul
+                const titleMatch = html.match(/<title>(.*?)<\/title>/i);
+                let foundPrice = 0;
+
+                if (titleMatch && titleMatch[1]) {
+                    const titleText = titleMatch[1];
+                    ui.log.innerText = `Başlık Okundu: ${titleText.substring(0, 30)}...`;
+                    
+                    // Başlık içindeki sayıları ayıkla (Örn: 5.150,50)
+                    // Regex: Nokta veya virgül içeren sayılar
+                    const numbers = titleText.match(/([0-9]{1,3}(?:\.[0-9]{3})*(?:,[0-9]+)?)/g);
+                    
+                    if (numbers) {
+                        // Genellikle en büyük sayı veya TL'den önceki sayı fiyattır.
+                        // Dizideki sayıları parse et, en mantıklısını (3000-10000 arası) al
+                        for(let numStr of numbers) {
+                            let val = parseFloat(numStr.replace(/\./g, '').replace(',', '.'));
+                            // Çeyrek altın mantık aralığı (2000 TL ile 15000 TL arası kabul edelim)
+                            if (val > 2000 && val < 15000) {
+                                foundPrice = val;
+                                break; 
+                            }
+                        }
+                    }
+                }
+
+                // 2. YÖNTEM: Eğer Title'da yoksa Meta Description'a bak
+                if (foundPrice === 0) {
+                    const metaMatch = html.match(/name="description" content="(.*?)"/i);
+                    if (metaMatch) {
+                        const metaText = metaMatch[1];
+                        const numbers = metaText.match(/([0-9]{1,3}(?:\.[0-9]{3})*(?:,[0-9]+)?)/g);
+                        if(numbers) {
+                            let val = parseFloat(numbers[0].replace(/\./g, '').replace(',', '.'));
+                            if (val > 2000) foundPrice = val;
+                        }
+                    }
+                }
+
+                // SONUÇ KONTROLÜ
+                if (foundPrice > 0) {
+                    currentPrice = foundPrice;
+                    ui.price.innerText = foundPrice.toLocaleString('tr-TR', {minimumFractionDigits: 2}) + ' ₺';
+                    ui.price.classList.add('text-green-400');
+                    ui.log.innerText = 'Veri başarıyla çekildi.';
+                    ui.log.className = 'log-box text-green-400';
+                    
+                    const d = new Date();
+                    ui.updateTime.innerText = d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0');
+                    
+                    renderAssets();
+                } else {
+                    throw new Error("Fiyat ayrıştırılamadı.");
+                }
+
+            } catch (error) {
+                console.error(error);
+                ui.log.innerText = 'Hata: ' + error.message;
+                ui.log.className = 'log-box text-red-400';
+                
+                // Hata durumunda eski fiyatı koru ama rengi değiştir
+                ui.price.classList.remove('text-green-400');
+                ui.price.classList.add('text-red-400');
+            }
+        }
+
+        // --- CÜZDAN YÖNETİMİ ---
+        function renderAssets() {
+            ui.list.innerHTML = '';
+            let total = 0;
+
+            if(assets.length === 0) {
+                ui.list.innerHTML = '<div class="text-center text-gray-600 text-xs py-4">Henüz çeyrek altın eklemediniz.</div>';
+            }
+
+            assets.forEach((item, index) => {
+                const val = item.amount * currentPrice;
+                total += val;
+
+                const div = document.createElement('div');
+                div.className = 'flex justify-between items-center bg-gray-700 p-3 rounded-lg border border-gray-600';
+                div.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="bg-amber-500 text-slate-900 w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs">Ç</div>
+                        <div>
+                            <div class="text-sm font-bold text-gray-200">${item.amount} Adet</div>
+                            <div class="text-[10px] text-gray-400">Yeni Çeyrek</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm font-bold font-mono">${val.toLocaleString('tr-TR', {maximumFractionDigits:0})} ₺</div>
+                        <button onclick="removeAsset(${index})" class="text-[10px] text-red-400 hover:text-red-300">Sil</button>
+                    </div>
+                `;
+                ui.list.appendChild(div);
+            });
+
+            ui.total.innerText = total.toLocaleString('tr-TR', {maximumFractionDigits:0}) + ' ₺';
+        }
+
+        function addAsset() {
+            const amount = prompt("Kaç adet Yeni Çeyrek Altın eklemek istiyorsunuz?");
+            if (amount && !isNaN(amount)) {
+                assets.push({ amount: parseFloat(amount) });
+                localStorage.setItem('direct_assets', JSON.stringify(assets));
+                renderAssets();
+            }
+        }
+
+        function removeAsset(index) {
+            if(confirm('Silmek istiyor musunuz?')) {
+                assets.splice(index, 1);
+                localStorage.setItem('direct_assets', JSON.stringify(assets));
+                renderAssets();
+            }
+        }
+
+        // --- BAŞLATMA ---
+        fetchDirectLink();
+        // 30 saniyede bir sayfayı tekrar kontrol et
+        setInterval(fetchDirectLink, 30000);
+
+    </script>
+</body>
+</html>
+
+                const html = data.contents;
+                
+                // --- STRATEJİ: Sayfa Başlığını (Title) Oku ---
+                // Harem Grafik sayfalarının başlığı şöyledir: "Çeyrek Altın - 5.150,00 TL - Harem Altın"
+                // Bu en güvenilir yöntemdir çünkü JS yüklenmese bile title sunucudan gelir.
+                
+                // 1. Title etiketini bul
+                const titleMatch = html.match(/<title>(.*?)<\/title>/i);
+                let foundPrice = 0;
+
+                if (titleMatch && titleMatch[1]) {
+                    const titleText = titleMatch[1];
+                    ui.log.innerText = `Başlık Okundu: ${titleText.substring(0, 30)}...`;
+                    
+                    // Başlık içindeki sayıları ayıkla (Örn: 5.150,50)
+                    // Regex: Nokta veya virgül içeren sayılar
+                    const numbers = titleText.match(/([0-9]{1,3}(?:\.[0-9]{3})*(?:,[0-9]+)?)/g);
+                    
+                    if (numbers) {
+                        // Genellikle en büyük sayı veya TL'den önceki sayı fiyattır.
+                        // Dizideki sayıları parse et, en mantıklısını (3000-10000 arası) al
+                        for(let numStr of numbers) {
+                            let val = parseFloat(numStr.replace(/\./g, '').replace(',', '.'));
+                            // Çeyrek altın mantık aralığı (2000 TL ile 15000 TL arası kabul edelim)
+                            if (val > 2000 && val < 15000) {
             <div class="flex gap-2">
                 <button onclick="toggleEditMode()" class="bg-gray-800 text-gray-300 px-3 py-2 rounded-lg text-xs font-medium border border-gray-700 hover:bg-gray-700 transition">
                     <i class="fas fa-pen"></i> Düzelt
@@ -347,4 +679,5 @@
     </script>
 </body>
 </html>
+
 
