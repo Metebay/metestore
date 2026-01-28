@@ -1,124 +1,350 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BAY DİGİTAL APP MARKET</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    body {
-      font-family: 'Inter', sans-serif;
-      background: radial-gradient(circle at top, #0f172a 0%, #020617 100%);
-      color: #e2e8f0;
-      overflow-x: hidden;
-    }
-
-    .app-card {
-      background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      transition: all 0.4s ease;
-      transform: perspective(600px) rotateX(0deg);
-    }
-
-    .app-card:hover {
-      transform: translateY(-10px) scale(1.03) rotateX(2deg);
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
-      border-color: rgba(255, 255, 255, 0.2);
-    }
-
-    .glass-input {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: #e2e8f0;
-      backdrop-filter: blur(12px);
-    }
-
-    .glass-input::placeholder {
-      color: #94a3b8;
-    }
-
-    .download-btn {
-      background: linear-gradient(90deg, #2563eb, #3b82f6);
-      transition: all 0.3s ease;
-    }
-
-    .download-btn:hover {
-      background: linear-gradient(90deg, #3b82f6, #2563eb);
-      transform: scale(1.05);
-      box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Altın & Döviz Takip (Harem Entegreli)</title>
+    <!-- Tailwind CSS (Tasarım için) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome (İkonlar için) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Özel Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #1f2937; }
+        ::-webkit-scrollbar-thumb { background: #d97706; border-radius: 3px; }
+        
+        /* Animasyonlar */
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        body { background-color: #111827; color: #f3f4f6; }
+    </style>
 </head>
+<body class="font-sans antialiased min-h-screen pb-20">
 
-<body class="min-h-screen">
+    <!-- Ana Konteyner -->
+    <div class="max-w-md mx-auto p-4">
 
-  <!-- Header -->
-  <header class="py-12 text-center">
-    <h1 class="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300 drop-shadow-md">
-      BAY DİGİTAL APP MARKET
-    </h1>
-    <p class="mt-3 text-gray-400 text-lg">
-      En yeni uygulamaları keşfet, indir ve dene 🚀
-    </p>
-  </header>
-
-  <!-- Arama -->
-  <section class="max-w-2xl mx-auto px-6 mb-10 relative">
-    <input id="searchInput" type="text" placeholder="🔍 Uygulama ara..."
-      class="glass-input w-full py-3 px-5 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-  </section>
-
-  <!-- App List -->
-  <main class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 px-6" id="appList">
-
-    <!-- App Card -->
-    <div class="app-card rounded-2xl overflow-hidden flex flex-col">
-      <div class="p-6 flex justify-center">
-        <img src="apk/carpim.png" alt="Çarpım Tablosu Öğreniyorum" class="w-28 h-28 rounded-2xl border border-gray-700 shadow-md object-cover">
-      </div>
-      <div class="px-6 pb-6 flex flex-col flex-grow">
-        <h2 class="text-xl font-bold text-center text-white mb-1" data-name="Çarpım Tablosu Öğreniyorum">
-          Çarpım Tablosu Öğreniyorum
-        </h2>
-        <p class="text-sm text-center text-blue-300 mb-2">Eğitim · Çocuklar için</p>
-        <p class="text-gray-300 text-sm text-center mb-4 flex-grow">
-          Renkli görseller ve eğlenceli testlerle çocukların çarpım tablosunu kolayca öğrenmesini sağlayan öğretici bir uygulama!
-        </p>
-        <div class="flex justify-between text-xs text-gray-400 mb-4">
-          <span>Versiyon: 2.0</span>
-          <span>Boyut: 12 MB</span>
+        <!-- Başlık ve Kontroller -->
+        <div class="flex justify-between items-center mb-6 mt-2">
+            <div>
+                <h1 class="text-xl font-bold text-amber-500 flex items-center gap-2">
+                    <i class="fas fa-wallet"></i> Altın Cüzdan
+                </h1>
+                <div id="status-indicator" class="text-[10px] text-gray-500 mt-1 flex items-center gap-1 font-mono">
+                    <i class="fas fa-circle-notch fa-spin"></i> Yükleniyor...
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="toggleEditMode()" class="bg-gray-800 text-gray-300 px-3 py-2 rounded-lg text-xs font-medium border border-gray-700 hover:bg-gray-700 transition">
+                    <i class="fas fa-pen"></i> Düzelt
+                </button>
+                <button onclick="fetchData()" class="bg-gray-800 text-gray-300 w-8 h-8 rounded-lg border border-gray-700 hover:text-white transition flex items-center justify-center">
+                    <i id="refresh-icon" class="fas fa-sync-alt"></i>
+                </button>
+            </div>
         </div>
-        <a href="apk/UgliestTurquoiseHornet (2).apk" download
-          class="download-btn mt-auto py-3 text-center text-white font-semibold rounded-lg">
-          📲 Uygulamayı İndir
-        </a>
-      </div>
+
+        <!-- Manuel Düzenleme Modalı (Gizli) -->
+        <div id="edit-modal" class="hidden bg-gray-800 p-4 rounded-xl border border-amber-500/50 mb-6 shadow-2xl relative fade-in">
+            <button onclick="toggleEditMode()" class="absolute top-2 right-2 text-gray-500 hover:text-white"><i class="fas fa-times"></i></button>
+            <h3 class="text-amber-500 font-bold text-sm mb-3"><i class="fas fa-sliders-h"></i> Fiyatları Elle Gir</h3>
+            <p class="text-xs text-gray-400 mb-4">Otomatik veri yanlışsa, gerçek piyasa fiyatlarını buraya girip sabitleyebilirsiniz.</p>
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs text-gray-400">Has Altın (TL)</label>
+                    <input type="number" id="input-manual-ga" class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-amber-400 font-bold outline-none focus:border-amber-500">
+                </div>
+                <div class="flex gap-3">
+                    <div>
+                        <label class="text-xs text-gray-400">Dolar</label>
+                        <input type="number" id="input-manual-usd" class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-green-400 font-mono outline-none focus:border-green-500">
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-400">Euro</label>
+                        <input type="number" id="input-manual-eur" class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-blue-400 font-mono outline-none focus:border-blue-500">
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-2 mt-4">
+                <button onclick="saveManualRates()" class="flex-1 bg-amber-600 hover:bg-amber-500 text-white py-2 rounded-lg text-sm font-bold">
+                    <i class="fas fa-save"></i> Kaydet & Sabitle
+                </button>
+                <button onclick="switchToAuto()" class="flex-1 bg-gray-700 hover:bg-gray-600 text-gray-200 py-2 rounded-lg text-sm">
+                    Otomatik Mod
+                </button>
+            </div>
+        </div>
+
+        <!-- Kur Gösterge Kartı -->
+        <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden mb-6 shadow-lg">
+            <div class="grid grid-cols-3 divide-x divide-gray-700">
+                <div class="p-4 text-center">
+                    <div class="text-[10px] text-gray-500 font-bold tracking-wider">DOLAR</div>
+                    <div id="rate-display-usd" class="text-lg font-mono font-bold text-green-400">0.00</div>
+                </div>
+                <div class="p-4 text-center">
+                    <div class="text-[10px] text-gray-500 font-bold tracking-wider">EURO</div>
+                    <div id="rate-display-eur" class="text-lg font-mono font-bold text-blue-400">0.00</div>
+                </div>
+                <div class="p-4 text-center bg-amber-500/10 relative">
+                    <div class="text-[10px] text-amber-600 font-bold tracking-wider">GRAM ALTIN</div>
+                    <div id="rate-display-ga" class="text-lg font-mono font-bold text-amber-500">0</div>
+                    <div id="manual-indicator" class="hidden absolute top-1 right-1 w-2 h-2 bg-amber-500 rounded-full" title="Manuel Fiyat"></div>
+                </div>
+            </div>
+            <div id="source-text" class="bg-gray-900/50 py-1 text-center text-[10px] text-gray-600">
+                Kaynak: Bekleniyor...
+            </div>
+        </div>
+
+        <!-- Toplam Bakiye Kartı -->
+        <div class="bg-gradient-to-r from-amber-700 to-yellow-800 rounded-2xl p-6 text-white shadow-xl mb-6 relative overflow-hidden">
+            <div class="absolute -right-6 -top-6 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
+            <p class="text-amber-100/70 text-xs font-bold uppercase tracking-widest mb-1">Toplam Varlık</p>
+            <h2 id="total-wealth" class="text-4xl font-bold font-mono tracking-tight">0 ₺</h2>
+        </div>
+
+        <!-- Ekleme Formu -->
+        <div class="bg-gray-800 p-3 rounded-xl border border-gray-700 mb-4">
+            <form id="add-form" class="flex gap-2">
+                <select id="asset-type" class="bg-gray-900 text-gray-200 text-sm rounded-lg px-3 py-3 border border-gray-700 outline-none focus:border-amber-500">
+                    <option value="GA">Has Altın</option>
+                    <option value="USD">Dolar ($)</option>
+                    <option value="EUR">Euro (€)</option>
+                    <option value="TL">TL</option>
+                </select>
+                <input type="number" id="asset-amount" step="any" placeholder="Miktar" class="flex-1 bg-gray-900 text-white text-sm rounded-lg px-3 py-3 border border-gray-700 outline-none focus:border-amber-500 font-mono" required>
+                <button type="submit" class="bg-amber-600 hover:bg-amber-500 text-white px-4 rounded-lg font-bold">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- Varlık Listesi -->
+        <div id="asset-list" class="space-y-2 pb-10">
+            <!-- JavaScript ile doldurulacak -->
+            <div class="text-center text-gray-600 py-4 text-sm">Yükleniyor...</div>
+        </div>
+
     </div>
 
-  </main>
+    <!-- JAVASCRIPT KODLARI -->
+    <script>
+        // --- BAŞLANGIÇ AYARLARI VE STATE ---
+        let assets = JSON.parse(localStorage.getItem('my_assets')) || [];
+        let rates = JSON.parse(localStorage.getItem('my_rates')) || {
+            USD: 0, EUR: 0, GA: 0, isManual: false, lastUpdate: '...'
+        };
 
-  <!-- Footer -->
-  <footer class="text-center text-gray-500 py-10 mt-12 border-t border-gray-700">
-    <p>&copy; 2025 <span class="text-blue-400 font-semibold">Bay Digital</span>. Tüm hakları saklıdır.</p>
-  </footer>
+        // --- GÜNCELLEME VE UI FONKSİYONLARI ---
+        function formatMoney(amount) {
+            return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', maximumFractionDigits: 0 }).format(amount);
+        }
 
-  <script>
-    // Basit Arama Fonksiyonu
-    const searchInput = document.getElementById('searchInput');
-    const appList = document.getElementById('appList');
-    const appCards = appList.getElementsByClassName('app-card');
+        function updateUI() {
+            // Kurları Göster
+            document.getElementById('rate-display-usd').innerText = rates.USD.toFixed(2);
+            document.getElementById('rate-display-eur').innerText = rates.EUR.toFixed(2);
+            document.getElementById('rate-display-ga').innerText = rates.GA.toLocaleString('tr-TR', {maximumFractionDigits: 0});
+            
+            // Kaynak Yazısı ve İkonlar
+            const statusDiv = document.getElementById('status-indicator');
+            const sourceDiv = document.getElementById('source-text');
+            const manualInd = document.getElementById('manual-indicator');
 
-    searchInput.addEventListener('keyup', function (event) {
-      const searchTerm = event.target.value.toLowerCase();
-      for (let i = 0; i < appCards.length; i++) {
-        const card = appCards[i];
-        const appName = card.querySelector('h2').getAttribute('data-name').toLowerCase();
-        card.style.display = appName.includes(searchTerm) ? 'flex' : 'none';
-      }
-    });
-  </script>
+            if (rates.isManual) {
+                statusDiv.innerHTML = '<i class="fas fa-lock text-amber-500"></i> Manuel Mod';
+                sourceDiv.innerText = 'Kaynak: Kişisel Ayar (Sabit)';
+                manualInd.classList.remove('hidden');
+            } else {
+                statusDiv.innerHTML = '<i class="fas fa-wifi text-green-500"></i> Otomatik';
+                sourceDiv.innerText = 'Kaynak: Harem Altın / Global';
+                manualInd.classList.add('hidden');
+            }
+
+            // Toplam Hesapla
+            let total = 0;
+            const listContainer = document.getElementById('asset-list');
+            listContainer.innerHTML = ''; // Listeyi temizle
+
+            if (assets.length === 0) {
+                listContainer.innerHTML = '<div class="text-center text-gray-600 py-8 text-sm border-2 border-dashed border-gray-800 rounded-xl">Listeniz boş.</div>';
+            }
+
+            assets.forEach(asset => {
+                let rate = 1;
+                let symbol = '₺';
+                let colorClass = 'text-white';
+
+                if(asset.type === 'USD') { rate = rates.USD; symbol = '$'; colorClass = 'text-green-400'; }
+                if(asset.type === 'EUR') { rate = rates.EUR; symbol = '€'; colorClass = 'text-blue-400'; }
+                if(asset.type === 'GA') { rate = rates.GA; symbol = 'gr'; colorClass = 'text-amber-400'; }
+
+                const assetVal = asset.amount * rate;
+                total += assetVal;
+
+                // Liste Elemanı HTML
+                const itemHtml = `
+                    <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 flex justify-between items-center group hover:border-amber-500/30 transition">
+                        <div class="flex items-center gap-3">
+                            <div class="font-bold w-8 ${colorClass}">${asset.type}</div>
+                            <div>
+                                <div class="font-bold text-gray-200">${asset.amount} <span class="text-xs text-gray-500 font-normal">${symbol}</span></div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-mono font-bold text-gray-200">${formatMoney(assetVal)}</div>
+                            <button onclick="deleteAsset(${asset.id})" class="text-gray-600 hover:text-red-400 text-xs mt-1 opacity-50 group-hover:opacity-100 transition">Sil</button>
+                        </div>
+                    </div>
+                `;
+                listContainer.insertAdjacentHTML('beforeend', itemHtml);
+            });
+
+            document.getElementById('total-wealth').innerText = formatMoney(total);
+
+            // LocalStorage Kaydet
+            localStorage.setItem('my_assets', JSON.stringify(assets));
+            localStorage.setItem('my_rates', JSON.stringify(rates));
+        }
+
+        // --- VERİ ÇEKME MOTORU (React Kodundan Uyarlandı) ---
+        async function fetchData() {
+            if (rates.isManual) {
+                updateUI();
+                return;
+            }
+
+            const refreshIcon = document.getElementById('refresh-icon');
+            refreshIcon.classList.add('fa-spin');
+
+            try {
+                // Harem Altın Proxy
+                const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent('https://haremaltin.com/dashboard/guncel-altin-fiyatlari');
+                const response = await fetch(proxyUrl);
+                const data = await response.json();
+                
+                if (!data.contents) throw new Error("Veri boş");
+
+                const content = data.contents;
+                
+                // Regex ile Veri Avı (Has Altın)
+                let goldPrice = 0;
+                // "HAS ALTIN" satırındaki 2. sayıyı (satış) bulmaya çalış
+                // Basit Regex: HAS ALTIN... 3.050,50
+                const goldMatch = content.match(/HAS ALTIN.*?([\d.]+),(\d{2})/s);
+                if (goldMatch) {
+                   // İlk match genellikle Alış fiyatına denk gelebilir, ancak Harem yapısında genelde yakındır.
+                   // Sayıyı temizle: 3.050 -> 3050
+                   const cleanStr = goldMatch[1].replace(/\./g, '') + '.' + goldMatch[2];
+                   goldPrice = parseFloat(cleanStr);
+                }
+
+                // Dolar ve Euro (DOM Parser ile)
+                let usd = 0, eur = 0;
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(content, 'text/html');
+                const rows = doc.querySelectorAll('tr');
+                
+                rows.forEach(row => {
+                    const txt = row.innerText.toUpperCase();
+                    if(txt.includes('USD/TRY')) {
+                        const cells = row.querySelectorAll('td');
+                        // Satır sonundaki sayısal değeri al
+                        const vals = Array.from(cells).map(c => c.innerText.trim()).filter(t => /^[0-9.,]+$/.test(t));
+                        if(vals.length > 0) usd = parseFloat(vals[vals.length - 1].replace(/\./g, '').replace(',', '.'));
+                    }
+                    if(txt.includes('EUR/TRY')) {
+                        const cells = row.querySelectorAll('td');
+                        const vals = Array.from(cells).map(c => c.innerText.trim()).filter(t => /^[0-9.,]+$/.test(t));
+                        if(vals.length > 0) eur = parseFloat(vals[vals.length - 1].replace(/\./g, '').replace(',', '.'));
+                    }
+                });
+
+                // Fallback (Yedek) - Eğer çekilemediyse
+                if (goldPrice === 0 || usd === 0) {
+                     console.log("Harem verisi eksik, yedeğe geçiliyor.");
+                     const res = await fetch('https://api.exchangerate-api.com/v4/latest/TRY');
+                     const gData = await res.json();
+                     if(usd === 0) usd = 1 / gData.rates.USD;
+                     if(eur === 0) eur = 1 / gData.rates.EUR;
+                     // Tahmini Altın
+                     if(goldPrice === 0) goldPrice = (2750 * usd) / 31.10; 
+                }
+
+                rates.USD = usd;
+                rates.EUR = eur;
+                rates.GA = goldPrice;
+                rates.lastUpdate = new Date().toLocaleTimeString('tr-TR');
+
+            } catch (error) {
+                console.error("Veri çekme hatası:", error);
+            } finally {
+                refreshIcon.classList.remove('fa-spin');
+                updateUI();
+            }
+        }
+
+        // --- ETKİLEŞİM FONKSİYONLARI ---
+        
+        // Varlık Ekle
+        document.getElementById('add-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const type = document.getElementById('asset-type').value;
+            const amount = parseFloat(document.getElementById('asset-amount').value);
+            
+            if (amount) {
+                assets.unshift({ id: Date.now(), type, amount });
+                document.getElementById('asset-amount').value = '';
+                updateUI();
+            }
+        });
+
+        // Varlık Sil
+        window.deleteAsset = function(id) {
+            if(confirm('Silmek istediğine emin misin?')) {
+                assets = assets.filter(a => a.id !== id);
+                updateUI();
+            }
+        };
+
+        // Manuel Mod Aç/Kapa
+        window.toggleEditMode = function() {
+            const modal = document.getElementById('edit-modal');
+            modal.classList.toggle('hidden');
+            
+            // Mevcut değerleri inputlara doldur
+            if (!modal.classList.contains('hidden')) {
+                document.getElementById('input-manual-ga').value = rates.GA;
+                document.getElementById('input-manual-usd').value = rates.USD;
+                document.getElementById('input-manual-eur').value = rates.EUR;
+            }
+        };
+
+        window.saveManualRates = function() {
+            rates.GA = parseFloat(document.getElementById('input-manual-ga').value);
+            rates.USD = parseFloat(document.getElementById('input-manual-usd').value);
+            rates.EUR = parseFloat(document.getElementById('input-manual-eur').value);
+            rates.isManual = true;
+            toggleEditMode();
+            updateUI();
+        };
+
+        window.switchToAuto = function() {
+            rates.isManual = false;
+            toggleEditMode();
+            fetchData(); // Hemen güncelle
+        };
+
+        // --- BAŞLATMA ---
+        updateUI(); // İlk çizim (localstorage verisiyle)
+        fetchData(); // Veri çekmeyi başlat
+        setInterval(fetchData, 60000); // 1 dakikada bir güncelle
+
+    </script>
 </body>
 </html>
 
